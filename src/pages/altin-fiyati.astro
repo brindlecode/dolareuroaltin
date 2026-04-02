@@ -1,0 +1,626 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import RateTicker from '../components/RateTicker.astro';
+import GoldCard from '../components/GoldCard.astro';
+import RateChart from '../components/RateChart.astro';
+import ConversionWidget from '../components/ConversionWidget.astro';
+import AffiliateBanner from '../components/AffiliateBanner.astro';
+import AdSenseSlot from '../components/AdSenseSlot.astro';
+import rates from '../data/rates_current.json';
+import historicalGold from '../data/rates_historical_gold.json';
+import { formatTRY, formatRate, getChangeClass, getChangeIcon, formatDateFull, formatDateShort } from '../utils/rateHelpers';
+
+const gold = rates.gold;
+const formattedDate = formatDateFull(rates.last_updated);
+
+const gram = gold.gram;
+const ceyrek = gold.ceyrek;
+const yarim = gold.yarim;
+const tam = gold.tam;
+const ata = gold.ata;
+const bilezik14 = gold.bilezik_14;
+const bilezik18 = gold.bilezik_18;
+const ons = gold.xau_usd;
+
+const formattedGramMid = formatTRY(gram.mid);
+const formattedGramBuying = formatRate(gram.buying);
+const formattedGramSelling = formatRate(gram.selling);
+const formattedGramChange = formatTRY(Math.abs(gram.change_daily));
+const formattedGramChangePct = Math.abs(gram.change_pct).toFixed(2).replace('.', ',');
+const gramChangePrefix = gram.direction === 'up' ? '+' : gram.direction === 'down' ? '-' : '';
+const gramChangeClass = getChangeClass(gram.direction);
+const gramChangeIcon = getChangeIcon(gram.direction);
+
+const formattedOnsMid = formatTRY(ons.mid);
+const formattedOnsChangePct = Math.abs(ons.change_pct).toFixed(2).replace('.', ',');
+const onsChangePrefix = ons.direction === 'up' ? '+' : ons.direction === 'down' ? '-' : '';
+const onsChangeClass = getChangeClass(ons.direction);
+
+const last7 = historicalGold.data.slice(-7);
+
+const gramOpen = formatRate(gram.open);
+const gramHigh = formatRate(gram.high);
+const gramLow = formatRate(gram.low);
+const gramPrevClose = formatRate(gram.prev_close);
+
+const dayRangeMin = gram.low;
+const dayRangeMax = gram.high;
+const dayRangePct = ((gram.mid - dayRangeMin) / (dayRangeMax - dayRangeMin)) * 100;
+
+const gramPerOns = 31.1035;
+const calculatedGramFromOns = ons.mid / gramPerOns;
+const spreadPct = ((gram.selling - gram.buying) / gram.mid * 100).toFixed(2).replace('.', ',');
+---
+
+<BaseLayout
+  title="Altın Fiyatı Bugün — Gram Çeyrek Yarım Tam Altın (2026)"
+  description="Altın fiyatı bugün ne kadar? Gram, çeyrek, yarım, tam ve ata altın fiyatları, altın grafik ve çevirici. Güncel altın fiyatları takibi."
+  canonical="https://dolareuroaltin.com/altin-fiyati"
+>
+  <Header slot="header" />
+
+  <RateTicker />
+
+  <section class="mb-8 mt-6" aria-label="Giriş">
+    <div class="text-center">
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
+        Altın Fiyatı Bugün — Gram Çeyrek Yarım Tam Altın
+      </h1>
+      <p class="text-sm text-gray-500 mb-1">{formattedDate}</p>
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Çeyrek altın detaylı fiyat">
+    <GoldCard
+      key="ceyrek"
+      name_tr={ceyrek.name_tr}
+      buying={ceyrek.buying}
+      selling={ceyrek.selling}
+      mid={ceyrek.mid}
+      change_daily={ceyrek.change_daily}
+      change_pct={ceyrek.change_pct}
+      direction={ceyrek.direction}
+      size="large"
+    />
+  </section>
+
+  <section class="mb-8" aria-label="Diğer altın türleri">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <GoldCard
+        key="yarim"
+        name_tr={yarim.name_tr}
+        buying={yarim.buying}
+        selling={yarim.selling}
+        mid={yarim.mid}
+        change_daily={yarim.change_daily}
+        change_pct={yarim.change_pct}
+        direction={yarim.direction}
+        size="medium"
+      />
+      <GoldCard
+        key="tam"
+        name_tr={tam.name_tr}
+        buying={tam.buying}
+        selling={tam.selling}
+        mid={tam.mid}
+        change_daily={tam.change_daily}
+        change_pct={tam.change_pct}
+        direction={tam.direction}
+        size="medium"
+      />
+      <GoldCard
+        key="ata"
+        name_tr={ata.name_tr}
+        buying={ata.buying}
+        selling={ata.selling}
+        mid={ata.mid}
+        change_daily={ata.change_daily}
+        change_pct={ata.change_pct}
+        direction={ata.direction}
+        size="medium"
+      />
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Gram altın">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-5 py-4 border-b border-gray-100">
+        <h2 class="text-lg font-bold text-gray-900">Gram Altın</h2>
+        <p class="text-xs text-gray-400 mt-0.5">En çok takip edilen altın birimi</p>
+      </div>
+      <div class="p-5">
+        <div class="flex items-baseline gap-2 mb-2">
+          <span class="text-3xl font-bold font-mono text-gray-900">₺{formattedGramMid}</span>
+          <span class={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-sm font-semibold ${gramChangeClass}`}>
+            {gramChangeIcon} {gramChangePrefix}{formattedGramChange} ({gramChangePrefix}{formattedGramChangePct}%)
+          </span>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mt-4">
+          <div class="bg-amber-50 rounded-xl p-4">
+            <div class="text-xs text-amber-600 font-medium mb-1">Alış</div>
+            <div class="text-lg font-mono font-semibold text-amber-900">₺{formattedGramBuying}</div>
+          </div>
+          <div class="bg-amber-50 rounded-xl p-4">
+            <div class="text-xs text-amber-600 font-medium mb-1">Satış</div>
+            <div class="text-lg font-mono font-semibold text-amber-900">₺{formattedGramSelling}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Bilezik ve ons fiyatları">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-5 py-4 border-b border-gray-100">
+        <h2 class="text-lg font-bold text-gray-900">Bilezik &amp; Ons Altın</h2>
+        <p class="text-xs text-gray-400 mt-0.5">14/22 ayar bilezik ve uluslararası ons fiyatı</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" role="table" aria-label="Bilezik ve ons altın fiyatları">
+          <thead>
+            <tr class="border-b border-gray-100 bg-gray-50">
+              <th class="py-3 px-5 text-left font-semibold text-gray-500 text-xs uppercase tracking-wider">Altın Türü</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Alış</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Satış</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Değişim</th>
+            </tr>
+          </thead>
+          <tbody>
+            <GoldCard key="gram" name_tr={gram.name_tr} buying={gram.buying} selling={gram.selling} mid={gram.mid} change_daily={gram.change_daily} change_pct={gram.change_pct} direction={gram.direction} size="small" />
+            <GoldCard key="bilezik_14" name_tr={bilezik14.name_tr} buying={bilezik14.buying} selling={bilezik14.selling} mid={bilezik14.mid} change_daily={bilezik14.change_daily} change_pct={bilezik14.change_pct} direction={bilezik14.direction} size="small" />
+            <GoldCard key="bilezik_18" name_tr={bilezik18.name_tr} buying={bilezik18.buying} selling={bilezik18.selling} mid={bilezik18.mid} change_daily={bilezik18.change_daily} change_pct={bilezik18.change_pct} direction={bilezik18.direction} size="small" />
+            <GoldCard key="xau_usd" name_tr={ons.name_tr} buying={ons.buying} selling={ons.selling} mid={ons.mid} change_daily={ons.change_daily} change_pct={ons.change_pct} direction={ons.direction} unit={ons.unit} size="small" />
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Gram altın gün içi fiyatlar">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-5 py-4 border-b border-gray-100">
+        <h2 class="text-lg font-bold text-gray-900">Gram Altın — Gün İçi Fiyatlar</h2>
+        <p class="text-xs text-gray-400 mt-0.5">2 Nisan 2026 işlem verileri</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" role="table" aria-label="Gram altın gün içi fiyatlar">
+          <thead>
+            <tr class="border-b border-gray-100 bg-gray-50">
+              <th class="py-3 px-5 text-left font-semibold text-gray-500 text-xs uppercase tracking-wider">Metrik</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Değer (₺)</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Değişim</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+              <td class="py-3 px-5 font-medium text-gray-700">Açılış</td>
+              <td class="py-3 px-5 text-right font-mono font-medium text-gray-900">{gramOpen}</td>
+              <td class="py-3 px-5 text-right text-xs text-gray-400">Gün başı fiyat</td>
+            </tr>
+            <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+              <td class="py-3 px-5 font-medium text-gray-700">En Yüksek</td>
+              <td class="py-3 px-5 text-right font-mono font-medium text-emerald-600">{gramHigh}</td>
+              <td class="py-3 px-5 text-right text-xs text-emerald-600">
+                +{formatRate(gram.high - gram.open)}
+              </td>
+            </tr>
+            <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+              <td class="py-3 px-5 font-medium text-gray-700">En Düşük</td>
+              <td class="py-3 px-5 text-right font-mono font-medium text-red-600">{gramLow}</td>
+              <td class="py-3 px-5 text-right text-xs text-red-600">
+                {formatRate(gram.low - gram.open)}
+              </td>
+            </tr>
+            <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+              <td class="py-3 px-5 font-medium text-gray-700">Güncel (Orta)</td>
+              <td class="py-3 px-5 text-right font-mono font-bold text-gray-900">{formattedGramMid}</td>
+              <td class="py-3 px-5 text-right">
+                <span class={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${gramChangeClass}`}>
+                  {gramChangeIcon} {gramChangePrefix}{formattedGramChangePct}%
+                </span>
+              </td>
+            </tr>
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="py-3 px-5 font-medium text-gray-700">Önceki Kapanış</td>
+              <td class="py-3 px-5 text-right font-mono font-medium text-gray-900">{gramPrevClose}</td>
+              <td class="py-3 px-5 text-right text-xs text-gray-400">Dün kapanış fiyatı</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="px-5 py-3 bg-gray-50 border-t border-gray-100">
+        <div class="flex items-center justify-between text-xs text-gray-500 mb-1.5">
+          <span>{formatRate(dayRangeMin)}</span>
+          <span>Gün içi aralık</span>
+          <span>{formatRate(dayRangeMax)}</span>
+        </div>
+        <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div class="h-full bg-amber-500 rounded-full" style={`width: ${Math.min(100, Math.max(0, dayRangePct))}%`}></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Gram altın grafiği">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+      <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <span class="text-lg">🪙</span>
+        Gram Altın Grafiği (TRY)
+      </h2>
+      <RateChart currency="GOLD" defaultPeriod="5y" height={400} />
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Son 7 gün gram altın">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-5 py-4 border-b border-gray-100">
+        <h2 class="text-lg font-bold text-gray-900">Son 7 Gün Gram Altın</h2>
+        <p class="text-xs text-gray-400 mt-0.5">TCMB resmi verileri</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" role="table" aria-label="Son 7 gün gram altın fiyatları">
+          <thead>
+            <tr class="border-b border-gray-100 bg-gray-50">
+              <th class="py-3 px-5 text-left font-semibold text-gray-500 text-xs uppercase tracking-wider">Tarih</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Açılış</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">En Yüksek</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">En Düşük</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Kapanış</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Değişim</th>
+            </tr>
+          </thead>
+          <tbody>
+            {last7.reverse().map((entry) => {
+              const dailyChange = entry.close - entry.open;
+              const dailyChangePct = (dailyChange / entry.open) * 100;
+              const isUp = dailyChange >= 0;
+              const rowClass = isUp ? 'text-emerald-600' : 'text-red-600';
+              const arrow = isUp ? '▲' : '▼';
+              const changeStr = `${isUp ? '+' : ''}${dailyChange.toFixed(2)} ₺ (${isUp ? '+' : ''}${dailyChangePct.toFixed(2).replace('.', ',')}%)`;
+              return (
+                <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                  <td class="py-3 px-5 font-medium text-gray-700">{formatDateShort(entry.date)}</td>
+                  <td class="py-3 px-5 text-right font-mono text-gray-900">{formatTRY(entry.open)}</td>
+                  <td class="py-3 px-5 text-right font-mono text-emerald-600">{formatTRY(entry.high)}</td>
+                  <td class="py-3 px-5 text-right font-mono text-red-600">{formatTRY(entry.low)}</td>
+                  <td class="py-3 px-5 text-right font-mono font-semibold text-gray-900">{formatTRY(entry.close)}</td>
+                  <td class={`py-3 px-5 text-right font-mono text-xs font-medium ${rowClass}`}>
+                    {arrow} {changeStr}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Altın hesaplama aracı">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <span class="text-xl">⚖️</span>
+        Gram Altın Hesaplama
+      </h2>
+      <p class="text-sm text-gray-500 mb-4">X gram altın kaç TL eder? Hemen hesaplayın.</p>
+      <div class="flex flex-col sm:flex-row items-center gap-4">
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <input
+            id="gold-gram-input"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            step="any"
+            placeholder="Gram miktarı girin"
+            class="w-full sm:w-48 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-lg font-mono font-semibold text-gray-900 placeholder-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all"
+          />
+          <span class="text-sm font-medium text-gray-500 whitespace-nowrap">gram</span>
+        </div>
+        <span class="text-2xl text-gray-300">=</span>
+        <div id="gold-result" class="text-2xl font-bold font-mono text-amber-700">
+          ₺0,00
+        </div>
+      </div>
+      <div class="mt-4 flex flex-wrap gap-2">
+        {[1, 5, 10, 25, 50, 100].map((g) => (
+          <button
+            class="quick-gram-btn px-3 py-1.5 rounded-lg bg-amber-50 text-sm font-medium text-amber-700 hover:bg-amber-100 active:scale-95 transition-all border border-amber-200"
+            data-gram={g}
+          >
+            {g} gram
+          </button>
+        ))}
+      </div>
+      <p class="mt-3 text-xs text-gray-400">
+        Gram altın fiyatı: ₺{formattedGramMid} (ortalama)
+      </p>
+    </div>
+  </section>
+
+  <script define:vars={{ gramMid: gram.mid }}>
+    const input = document.getElementById('gold-gram-input') as HTMLInputElement;
+    const result = document.getElementById('gold-result') as HTMLDivElement;
+
+    function formatTRY(num: number): string {
+      return num.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function calculate(): void {
+      const grams = parseFloat(input.value);
+      if (isNaN(grams) || grams <= 0) {
+        result.textContent = '₺0,00';
+        return;
+      }
+      const total = grams * gramMid;
+      result.textContent = `₺${formatTRY(total)}`;
+    }
+
+    input.addEventListener('input', calculate);
+
+    document.querySelectorAll('.quick-gram-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const gram = (btn as HTMLButtonElement).dataset.gram;
+        if (gram) {
+          input.value = gram;
+          calculate();
+        }
+      });
+    });
+  </script>
+
+  <section class="mb-8" aria-label="Döviz çevirici">
+    <ConversionWidget />
+  </section>
+
+  <AffiliateBanner type="gold" />
+
+  <section class="mb-8" aria-label="Altın türleri arasındaki fark">
+    <article class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">Altın Türleri Arasındaki Fark Nedir?</h2>
+      <div class="prose prose-gray max-w-none">
+        <p class="text-gray-600 leading-relaxed mb-4">
+          Türkiye'de altın piyasasında farklı ağırlık ve ayarlarda altın türleri işlem görür. Her birinin
+          kendine özgü kullanım alanı ve fiyatlandırması vardır:
+        </p>
+
+        <div class="space-y-6 mb-6">
+          <div class="flex items-start gap-3">
+            <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-sm">1g</div>
+            <div>
+              <h3 class="font-semibold text-gray-900 mb-1">Gram Altın</h3>
+              <p class="text-sm text-gray-600 leading-relaxed">
+                En temel altın birimidir. 1 gram 24 ayar saf altını ifade eder. Yatırım amaçlı en çok tercih edilen
+                formdur. Uluslararası piyasalarda ons bazında belirlenen altın fiyatının gram karşılığıdır.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-sm">¼</div>
+            <div>
+              <h3 class="font-semibold text-gray-900 mb-1">Çeyrek Altın</h3>
+              <p class="text-sm text-gray-600 leading-relaxed">
+                Yaklaşık 1,75 gram ağırlığındadır ve 22 ayar altından üretilir. Genellikle takı ve hediye amaçlı
+                tercih edilir. Türkiye'de en yaygın kullanılan altın türlerinden biridir.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-sm">½</div>
+            <div>
+              <h3 class="font-semibold text-gray-900 mb-1">Yarım Altın</h3>
+              <p class="text-sm text-gray-600 leading-relaxed">
+                Yaklaşık 3,5 gram ağırlığında, 22 ayar altındandır. Çeyrek altının iki katı değerindedir.
+                Düğün ve özel günlerde hediye olarak sıkça tercih edilir.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-sm">1</div>
+            <div>
+              <h3 class="font-semibold text-gray-900 mb-1">Tam Altın (Cumhuriyet Altını)</h3>
+              <p class="text-sm text-gray-600 leading-relaxed">
+                Yaklaşık 7 gram ağırlığında, 22 ayar altındandır. Cumhuriyet altını olarak da bilinir.
+                Yatırım ve hediye amaçlı en popüler seçeneklerden biridir.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-sm">A</div>
+            <div>
+              <h3 class="font-semibold text-gray-900 mb-1">Ata Altın</h3>
+              <p class="text-sm text-gray-600 leading-relaxed">
+                Tam altın ile aynı ağırlıkta (yaklaşık 7 gram) ve ayardadır. Cumhuriyet altınına göre
+                genellikle küçük bir primle işlem görür. Yatırımcılar arasında popüler bir tercihtir.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-xs">14K</div>
+            <div>
+              <h3 class="font-semibold text-gray-900 mb-1">14 Ayar Bilezik</h3>
+              <p class="text-sm text-gray-600 leading-relaxed">
+                %58,3 oranında saf altın içerir. Takı sektöründe yaygın kullanılan bir ayardır.
+                Gram altından daha düşük fiyatlıdır çünkü saf altın oranı daha düşüktür.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-xs">ONS</div>
+            <div>
+              <h3 class="font-semibold text-gray-900 mb-1">Ons Altın (XAU/USD)</h3>
+              <p class="text-sm text-gray-600 leading-relaxed">
+                Uluslararası piyasalarda kullanılan birimdir. 1 ons = 31,1035 gramdır ve fiyatı ABD doları
+                cinsinden belirlenir. Gram altın fiyatı, ons fiyatının TL karşılığı ile hesaplanır.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-amber-50 rounded-xl p-4 border border-amber-100">
+          <h3 class="font-semibold text-amber-900 mb-2">Gram Altın ile Ons Altın İlişkisi</h3>
+          <p class="text-sm text-amber-800 leading-relaxed">
+            Gram altın fiyatı, uluslararası ons fiyatından türetilir. Formül şöyledir:
+            <strong>Gram Altın (₺) = Ons Fiyatı (USD) ÷ 31,1035 × USD/TRY Kuru</strong>
+          </p>
+          <p class="text-sm text-amber-700 mt-2">
+            Bugünkü verilerle: {formatTRY(ons.mid)} USD ÷ {gramPerOns} × {formatRate(rates.rates.USD.mid)} ≈ ₺{formatTRY(calculatedGramFromOns)}
+          </p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="mb-8" aria-label="Gram altın nasıl hesaplanır">
+    <article class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">Gram Altın Nasıl Hesaplanır?</h2>
+      <div class="prose prose-gray max-w-none">
+        <p class="text-gray-600 leading-relaxed mb-4">
+          Gram altın fiyatı, uluslararası altın piyasasındaki ons fiyatı ve USD/TRY döviz kuru kullanılarak
+          hesaplanır. İşte adım adım hesaplama formülü:
+        </p>
+
+        <div class="bg-gray-50 rounded-xl p-5 mb-6 border border-gray-200">
+          <h3 class="font-semibold text-gray-900 mb-3">Hesaplama Formülü</h3>
+          <div class="font-mono text-sm bg-white rounded-lg p-4 border border-gray-200 text-center">
+            <span class="text-amber-700 font-bold">Gram Altın (₺)</span> = <span class="text-blue-700">Ons Fiyatı (USD)</span> ÷ <span class="text-gray-700">31,1035</span> × <span class="text-emerald-700">USD/TRY Kuru</span>
+          </div>
+        </div>
+
+        <div class="space-y-4 mb-6">
+          <div class="flex items-start gap-3">
+            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-bold">1</span>
+            <div>
+              <h4 class="font-medium text-gray-900">Ons fiyatını belirleyin</h4>
+              <p class="text-sm text-gray-600">
+                Uluslararası piyasalarda 1 ons altın şu an <strong>{formatTRY(ons.mid)} USD</strong> seviyesinde işlem görüyor.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-bold">2</span>
+            <div>
+              <h4 class="font-medium text-gray-900">Onsu grama çevirin</h4>
+              <p class="text-sm text-gray-600">
+                1 ons = 31,1035 gram. Ons fiyatını bu sayıya bölerek gram başına USD fiyatını bulun:
+                <strong> {formatTRY(ons.mid)} ÷ {gramPerOns} = {formatTRY(calculatedGramFromOns)} USD/gram</strong>
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-bold">3</span>
+            <div>
+              <h4 class="font-medium text-gray-900">USD/TRY kuru ile çarpın</h4>
+              <p class="text-sm text-gray-600">
+                Gram fiyatını TL'ye çevirmek için güncel USD/TRY kuru ile çarpın:
+                <strong> {formatTRY(calculatedGramFromOns)} × {formatRate(rates.rates.USD.mid)} ≈ ₺{formattedGramMid}</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-blue-50 rounded-xl p-4 border border-blue-100 mb-4">
+          <p class="text-sm text-blue-800 leading-relaxed">
+            <strong>Not:</strong> Piyasada gördüğünüz alış ve satış fiyatları arasında spread (makas) bulunur.
+            Gram altın için alış-satış farkı %{spreadPct} seviyesindedir. Bu fark, kuyumcu ve banka gibi
+            aracı kurumların komisyonlarını yansıtır.
+          </p>
+        </div>
+
+        <h3 class="text-lg font-bold text-gray-900 mb-3">Altın Türlerinin Birbirine Göre Değeri</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm" role="table" aria-label="Altın türleri karşılaştırma">
+            <thead>
+              <tr class="border-b border-gray-100 bg-gray-50">
+                <th class="py-3 px-4 text-left font-semibold text-gray-500 text-xs uppercase tracking-wider">Altın Türü</th>
+                <th class="py-3 px-4 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Yaklaşık Ağırlık</th>
+                <th class="py-3 px-4 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Ayar</th>
+                <th class="py-3 px-4 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Ortalama Fiyat</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                <td class="py-3 px-4 font-medium text-gray-700">Gram Altın</td>
+                <td class="py-3 px-4 text-right font-mono text-gray-900">1,00 g</td>
+                <td class="py-3 px-4 text-right text-gray-600">24 ayar</td>
+                <td class="py-3 px-4 text-right font-mono font-semibold text-gray-900">₺{formattedGramMid}</td>
+              </tr>
+              <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                <td class="py-3 px-4 font-medium text-gray-700">Çeyrek Altın</td>
+                <td class="py-3 px-4 text-right font-mono text-gray-900">1,75 g</td>
+                <td class="py-3 px-4 text-right text-gray-600">22 ayar</td>
+                <td class="py-3 px-4 text-right font-mono font-semibold text-gray-900">₺{formatTRY(ceyrek.mid)}</td>
+              </tr>
+              <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                <td class="py-3 px-4 font-medium text-gray-700">Yarım Altın</td>
+                <td class="py-3 px-4 text-right font-mono text-gray-900">3,50 g</td>
+                <td class="py-3 px-4 text-right text-gray-600">22 ayar</td>
+                <td class="py-3 px-4 text-right font-mono font-semibold text-gray-900">₺{formatTRY(yarim.mid)}</td>
+              </tr>
+              <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                <td class="py-3 px-4 font-medium text-gray-700">Tam Altın</td>
+                <td class="py-3 px-4 text-right font-mono text-gray-900">7,00 g</td>
+                <td class="py-3 px-4 text-right text-gray-600">22 ayar</td>
+                <td class="py-3 px-4 text-right font-mono font-semibold text-gray-900">₺{formatTRY(tam.mid)}</td>
+              </tr>
+              <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                <td class="py-3 px-4 font-medium text-gray-700">Ata Altın</td>
+                <td class="py-3 px-4 text-right font-mono text-gray-900">7,00 g</td>
+                <td class="py-3 px-4 text-right text-gray-600">22 ayar</td>
+                <td class="py-3 px-4 text-right font-mono font-semibold text-gray-900">₺{formatTRY(ata.mid)}</td>
+              </tr>
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="py-3 px-4 font-medium text-gray-700">Ons Altın</td>
+                <td class="py-3 px-4 text-right font-mono text-gray-900">31,1035 g</td>
+                <td class="py-3 px-4 text-right text-gray-600">24 ayar</td>
+                <td class="py-3 px-4 text-right font-mono font-semibold text-gray-900">${formatTRY(ons.mid)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="mb-8" aria-label="İlgili sayfalar">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-lg font-bold text-gray-900 mb-4">İlgili Sayfalar</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <a href="/dolar-kuru" class="group flex items-center gap-3 p-4 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all">
+          <span class="text-3xl">🇺🇸</span>
+          <div>
+            <div class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">Dolar Kuru</div>
+            <div class="text-xs text-gray-500">USD/TRY güncel fiyat</div>
+          </div>
+        </a>
+        <a href="/euro-kuru" class="group flex items-center gap-3 p-4 rounded-xl border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all">
+          <span class="text-3xl">🇪🇺</span>
+          <div>
+            <div class="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors">Euro Kuru</div>
+            <div class="text-xs text-gray-500">EUR/TRY güncel fiyat</div>
+          </div>
+        </a>
+        <a href="/doviz-cevirici" class="group flex items-center gap-3 p-4 rounded-xl border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50 transition-all">
+          <span class="text-3xl">💱</span>
+          <div>
+            <div class="font-semibold text-gray-900 group-hover:text-emerald-700 transition-colors">Döviz Çevirici</div>
+            <div class="text-xs text-gray-500">Anlık dönüştürme</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <AdSenseSlot size="leaderboard" />
+
+  <Footer slot="footer" />
+</BaseLayout>

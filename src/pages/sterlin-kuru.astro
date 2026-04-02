@@ -1,0 +1,139 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import RateTicker from '../components/RateTicker.astro';
+import RateCard from '../components/RateCard.astro';
+import RateChart from '../components/RateChart.astro';
+import ConversionWidget from '../components/ConversionWidget.astro';
+import AdSenseSlot from '../components/AdSenseSlot.astro';
+import rates from '../data/rates_current.json';
+import { formatTRY, formatRate, getChangeClass, getChangeIcon, formatDateFull } from '../utils/rateHelpers';
+
+const gbp = rates.rates.GBP;
+const formattedDate = formatDateFull(rates.last_updated);
+
+const formattedMid = formatTRY(gbp.mid);
+const formattedBuying = formatRate(gbp.buying);
+const formattedSelling = formatRate(gbp.selling);
+const formattedChangePct = Math.abs(gbp.change_pct).toFixed(2).replace('.', ',');
+const changePrefix = gbp.direction === 'up' ? '+' : gbp.direction === 'down' ? '-' : '';
+const changeClass = gbp.direction === 'up' ? 'text-emerald-600 bg-emerald-50' : gbp.direction === 'down' ? 'text-red-600 bg-red-50' : 'text-gray-500 bg-gray-50';
+const changeIcon = getChangeIcon(gbp.direction);
+---
+
+<BaseLayout
+  title="Sterlin Kuru Bugün — GBP/TRY Anlık Fiyat (2026)"
+  description="Sterlin kuru bugün ne kadar? GBP/TRY anlık fiyat, günlük değişim, grafik ve döviz çevirici. TCMB resmi verisi ile güncel sterlin kuru takibi."
+  canonical="https://dolareuroaltin.com/sterlin-kuru"
+>
+  <Header slot="header" />
+
+  <RateTicker />
+
+  <section class="mb-8 mt-6" aria-label="Giriş">
+    <div class="text-center">
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
+        Sterlin Kuru Bugün — GBP/TRY Anlık Fiyat
+      </h1>
+      <p class="text-sm text-gray-500 mb-1">{formattedDate}</p>
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="GBP/TRY detaylı kur">
+    <RateCard
+      code={gbp.code}
+      name_tr={gbp.name_tr}
+      symbol={gbp.symbol}
+      flag={gbp.flag}
+      buying={gbp.buying}
+      selling={gbp.selling}
+      mid={gbp.mid}
+      change_daily={gbp.change_daily}
+      change_pct={gbp.change_pct}
+      direction={gbp.direction}
+      open={gbp.open}
+      high={gbp.high}
+      low={gbp.low}
+      prev_close={gbp.prev_close}
+      week_high={gbp.week_high}
+      week_low={gbp.week_low}
+      month_high={gbp.month_high}
+      month_low={gbp.month_low}
+      year_high={gbp.year_high}
+      year_low={gbp.year_low}
+      size="large"
+    />
+  </section>
+
+  <section class="mb-8" aria-label="GBP/TRY grafik">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+      <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <span class="text-lg">{gbp.flag}</span>
+        GBP/TRY Grafiği
+      </h2>
+      <RateChart currency="GBP" defaultPeriod="1y" height={350} />
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Döviz çevirici">
+    <ConversionWidget />
+  </section>
+
+  <section class="mb-8" aria-label="İngiliz Sterlini hakkında">
+    <article class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">İngiliz Sterlini Hakkında</h2>
+      <div class="prose prose-gray max-w-none">
+        <p class="text-gray-600 leading-relaxed mb-4">
+          İngiliz Sterlini (GBP), Birleşik Krallık'ın resmi para birimidir ve dünyanın en eski para birimlerinden
+          biridir. Sterlin, ABD Doları ve Euro'nun ardından dünyanın en çok işlem gören üçüncü para birimidir.
+          GBP/TRY paritesi, Türkiye ile İngiltere arasındaki ticari ilişkiler, turizm ve yatırım akışları açısından
+          büyük önem taşır.
+        </p>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          Sterlin kuru, Bank of England'ın faiz kararları, Brexit sonrası ekonomik gelişmeler, İngiltere enflasyon
+          verileri ve küresel piyasa koşullarından doğrudan etkilenir. Türkiye tarafında ise TCMB politikaları,
+          enflasyon verileri ve cari denge GBP/TRY hareketlerini belirleyen temel faktörler arasındadır.
+        </p>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          İngiltere'ye seyahat, eğitim veya iş amaçlı gidecekler için sterlin kuru takibi büyük önem taşır.
+          Güncel GBP/TRY kurunu takip ederek en uygun zamanda döviz alabilir ve bütçenizi daha iyi
+          planlayabilirsiniz.
+        </p>
+      </div>
+    </article>
+  </section>
+
+  <section class="mb-8" aria-label="İlgili sayfalar">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-lg font-bold text-gray-900 mb-4">İlgili Sayfalar</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <a href="/dolar-kuru" class="group flex items-center gap-3 p-4 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all">
+          <span class="text-3xl">🇺🇸</span>
+          <div>
+            <div class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">Dolar Kuru</div>
+            <div class="text-xs text-gray-500">USD/TRY güncel fiyat</div>
+          </div>
+        </a>
+        <a href="/euro-kuru" class="group flex items-center gap-3 p-4 rounded-xl border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all">
+          <span class="text-3xl">🇪🇺</span>
+          <div>
+            <div class="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors">Euro Kuru</div>
+            <div class="text-xs text-gray-500">EUR/TRY güncel fiyat</div>
+          </div>
+        </a>
+        <a href="/altin-fiyati" class="group flex items-center gap-3 p-4 rounded-xl border border-gray-100 hover:border-amber-200 hover:bg-amber-50 transition-all">
+          <span class="text-3xl">🪙</span>
+          <div>
+            <div class="font-semibold text-gray-900 group-hover:text-amber-700 transition-colors">Altın Fiyatı</div>
+            <div class="text-xs text-gray-500">Gram, çeyrek, tam altın</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <AdSenseSlot size="leaderboard" />
+
+  <Footer slot="footer" />
+</BaseLayout>

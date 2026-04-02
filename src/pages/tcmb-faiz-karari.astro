@@ -1,0 +1,231 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import RateTicker from '../components/RateTicker.astro';
+import AdSenseSlot from '../components/AdSenseSlot.astro';
+import EconomicCalendar from '../components/EconomicCalendar.astro';
+import calendarData from '../data/economic_calendar.json';
+import ratesCurrent from '../data/rates_current.json';
+import { formatTRY, formatDateFull } from '../utils/rateHelpers';
+
+const formattedDate = formatDateFull(ratesCurrent.last_updated);
+
+const tcmbEvents = calendarData.events.filter(e => e.type === 'tcmb');
+const faizKararlari = tcmbEvents.filter(e => e.title_tr.includes('Faiz Kararı'));
+
+const historicalRates = [
+  { date: '2021 Eylül', rate: 8.50, change: '▲ +1.00', direction: 'up' as const, note: 'Sıkı para politikasına geçiş' },
+  { date: '2021 Ekim', rate: 9.00, change: '▲ +0.50', direction: 'up' as const, note: 'Enflasyonla mücadele' },
+  { date: '2021 Kasım', rate: 10.00, change: '▲ +1.00', direction: 'up' as const, note: 'Agresif sıkılaştırma' },
+  { date: '2021 Aralık', rate: 11.00, change: '▲ +1.00', direction: 'up' as const, note: 'KKM sistemiyle birlikte' },
+  { date: '2022 Ocak', rate: 14.00, change: '▲ +3.00', direction: 'up' as const, note: 'Kur krizi sonrası' },
+  { date: '2022 Şubat', rate: 14.00, change: '— 0.00', direction: 'neutral' as const, note: 'Beklemede' },
+  { date: '2022 Mart', rate: 14.00, change: '— 0.00', direction: 'neutral' as const, note: 'Sabit tutuldu' },
+  { date: '2022 Nisan', rate: 14.00, change: '— 0.00', direction: 'neutral' as const, note: 'Sabit tutuldu' },
+  { date: '2022 Mayıs', rate: 14.00, change: '— 0.00', direction: 'neutral' as const, note: 'Sabit tutuldu' },
+  { date: '2022 Haziran', rate: 13.00, change: '▼ -1.00', direction: 'down' as const, note: 'İlk indirim' },
+  { date: '2022 Temmuz', rate: 12.00, change: '▼ -1.00', direction: 'down' as const, note: 'İndirim döngüsü' },
+  { date: '2022 Ağustos', rate: 11.00, change: '▼ -1.00', direction: 'down' as const, note: 'İndirim devam' },
+  { date: '2023 Haziran', rate: 15.00, change: '▲ +4.00', direction: 'up' as const, note: 'Yeni ekonomi yönetimi' },
+  { date: '2023 Temmuz', rate: 25.00, change: '▲ +10.00', direction: 'up' as const, note: 'Büyük artış' },
+  { date: '2023 Ağustos', rate: 30.00, change: '▲ +5.00', direction: 'up' as const, note: 'Sıkılaştırma devam' },
+  { date: '2023 Eylül', rate: 30.00, change: '— 0.00', direction: 'neutral' as const, note: 'Beklemede' },
+  { date: '2023 Ekim', rate: 35.00, change: '▲ +5.00', direction: 'up' as const, note: 'Ek sıkılaştırma' },
+  { date: '2023 Kasım', rate: 40.00, change: '▲ +5.00', direction: 'up' as const, note: 'Zirveye yaklaşma' },
+  { date: '2023 Aralık', rate: 42.50, change: '▲ +2.50', direction: 'up' as const, note: 'Mevcut seviye' },
+  { date: '2024-2026', rate: 42.50, change: '— 0.00', direction: 'neutral' as const, note: 'Sıkı politika korunuyor' },
+];
+
+const currentPolicyRate = 42.50;
+
+const nextMeeting = faizKararlari.find(e => new Date(e.date) >= new Date('2026-04-02'));
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'TCMB Faiz Kararı',
+  url: 'https://dolareuroaltin.com/tcmb-faiz-karari',
+  description: 'TCMB politika faizi, PPK toplantı takvimi ve faiz kararı etkileri.',
+  mainEntity: {
+    '@type': 'Organization',
+    name: 'Türkiye Cumhuriyet Merkez Bankası',
+    url: 'https://www.tcmb.gov.tr',
+  },
+};
+---
+
+<BaseLayout
+  title="TCMB Faiz Kararı — Politika Faizi ve PPK Toplantıları 2026"
+  description="TCMB faiz kararı, politika faizi oranı ve PPK toplantı takvimi. Güncel faiz oranı %42.50. Döviz ve altın piyasalarına etkileri."
+  canonical="https://dolareuroaltin.com/tcmb-faiz-karari"
+>
+  <Header slot="header" />
+
+  <RateTicker />
+
+  <section class="mb-8 mt-6" aria-label="Giriş">
+    <div class="text-center">
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
+        TCMB Faiz Kararı — Politika Faizi ve PPK Toplantıları
+      </h1>
+      <p class="text-sm text-gray-500 mb-1">{formattedDate}</p>
+      <p class="text-xs text-gray-400">TCMB resmi verileri • PPK toplantı takvimi</p>
+    </div>
+  </section>
+
+  <AdSenseSlot size="leaderboard" />
+
+  <section class="mb-8" aria-label="Mevcut politika faizi">
+    <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 text-white">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <p class="text-sm text-blue-200 mb-1">TCMB Politika Faizi (1 Hafta Repo)</p>
+          <p class="text-5xl font-bold font-mono">%{formatTRY(currentPolicyRate)}</p>
+        </div>
+        <div class="text-right">
+          <div class="bg-white/10 rounded-xl px-4 py-3">
+            <p class="text-xs text-blue-200 mb-1">Son Karar</p>
+            <p class="text-sm font-semibold">Sabit Tutuldu</p>
+            <p class="text-xs text-blue-200 mt-0.5">PPK Toplantısı</p>
+          </div>
+        </div>
+      </div>
+      {nextMeeting && (
+        <div class="bg-white/10 rounded-xl px-4 py-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs text-blue-200 mb-0.5">Bir Sonraki PPK Toplantısı</p>
+              <p class="font-semibold">{new Date(nextMeeting.date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-xs text-blue-200 mb-0.5">Beklenti</p>
+              <p class="font-semibold">%{formatTRY(currentPolicyRate)}</p>
+              <p class="text-xs text-blue-200">Değişim beklenmiyor</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="TCMB faiz geçmişi">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-5 py-4 border-b border-gray-100">
+        <h2 class="text-lg font-bold text-gray-900">TCMB Politika Faizi Tarihçesi</h2>
+        <p class="text-xs text-gray-400 mt-0.5">2021-2026 dönemi faiz kararları</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" role="table" aria-label="TCMB faiz tarihçesi">
+          <thead>
+            <tr class="border-b border-gray-100 bg-gray-50">
+              <th class="py-3 px-5 text-left font-semibold text-gray-500 text-xs uppercase tracking-wider">Tarih</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Faiz Oranı</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Değişim</th>
+              <th class="py-3 px-5 text-left font-semibold text-gray-500 text-xs uppercase tracking-wider hidden sm:table-cell">Not</th>
+            </tr>
+          </thead>
+          <tbody>
+            {historicalRates.map((entry) => {
+              const changeClass = entry.direction === 'up' ? 'text-emerald-600' : entry.direction === 'down' ? 'text-red-600' : 'text-gray-400';
+              return (
+                <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                  <td class="py-3 px-5 font-medium text-gray-900">{entry.date}</td>
+                  <td class="py-3 px-5 text-right font-mono font-bold text-gray-900">%{formatTRY(entry.rate)}</td>
+                  <td class={`py-3 px-5 text-right font-mono text-xs font-medium ${changeClass}`}>
+                    {entry.change}
+                  </td>
+                  <td class="py-3 px-5 text-sm text-gray-500 hidden sm:table-cell">{entry.note}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Ekonomik takvim">
+    <EconomicCalendar />
+  </section>
+
+  <AdSenseSlot size="rectangle" />
+
+  <section class="mb-8" aria-label="TCMB faiz kararı nedir">
+    <article class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">TCMB Faiz Kararı Nedir?</h2>
+      <div class="prose prose-gray max-w-none">
+        <p class="text-gray-600 leading-relaxed mb-4">
+          TCMB (Türkiye Cumhuriyet Merkez Bankası) Para Politikası Kurulu (PPK), yılda 8 kez toplanarak politika faizi
+          kararını belirler. Politika faizi, TCMB'nin bankalara kısa vadeli borç verme faiz oranıdır ve ekonominin en
+          önemli fiyatlandırma mekanizmalarından biridir. Politika faizi, enflasyon hedefine ulaşmak için kullanılan
+          temel para politikası aracıdır.
+        </p>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Politika Faizi Nasıl Belirlenir?</h3>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          PPK toplantılarında enflasyon görünümü, büyüme verileri, cari denge, küresel ekonomik gelişmeler ve finansal
+          istikrar göstergeleri değerlendirilir. Kurul, enflasyonu düşürmek için faiz artırımı, ekonomiyi canlandırmak
+          için faiz indirimi veya mevcut durumu korumak için faizi sabit tutma kararı alabilir. Kararlar, toplantı
+          gününde saat 14:00'te TCMB'nin resmi internet sitesinde yayımlanır.
+        </p>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Faiz Kararları Piyasaları Nasıl Etkiler?</h3>
+        <ul class="space-y-2 text-gray-600 mb-4">
+          <li class="flex items-start gap-2">
+            <span class="text-blue-500 mt-1 flex-shrink-0">●</span>
+            <span><strong className="text-gray-900">Döviz kurları:</strong> Faiz artışı genellikle TL'yi güçlendirir, dolar ve euro kurlarında düşüşe neden olabilir. Faiz indirimi ise ters etki yapabilir.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-blue-500 mt-1 flex-shrink-0">●</span>
+            <span><strong className="text-gray-900">Altın fiyatları:</strong> Yüksek faiz ortamında altın gibi faiz getirmeyen varlıklara talep azalabilir. Ancak enflasyon beklentileri altın talebini destekleyebilir.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-blue-500 mt-1 flex-shrink-0">●</span>
+            <span><strong className="text-gray-900">Borsa İstanbul:</strong> Faiz kararları hisse senedi piyasasını da etkiler. Yüksek faiz, şirketlerin finansman maliyetlerini artırarak kârlılığı baskılayabilir.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-blue-500 mt-1 flex-shrink-0">●</span>
+            <span><strong className="text-gray-900">Kredi ve mevduat faizleri:</strong> Politika faizi, ticari ve tüketici kredi faizlerini doğrudan etkiler. Yüksek politika faizi, kredi maliyetlerini artırır.</span>
+          </li>
+        </ul>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">2026 Yılı TCMB Faiz Görünümü</h3>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          TCMB, 2026 yılında politika faizini %{formatTRY(currentPolicyRate)} seviyesinde tutmaya devam etmektedir.
+          Enflasyondaki düşüş eğilimi devam ederse, yılın ikinci yarısında kademeli faiz indirimleri gündeme gelebilir.
+          Piyasa katılımcıları, enflasyon verilerini ve TCMB'nin sıkı para politikası duruşunu yakından takip etmektedir.
+          Yıl sonu için %35-40 aralığında bir politika faizi beklentisi bulunmaktadır.
+        </p>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">PPK Toplantı Takvimi</h3>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          TCMB PPK toplantıları yılda 8 kez gerçekleştirilir. 2026 yılı için planlanan faiz kararı toplantıları
+          yukarıdaki ekonomik takvimde yer almaktadır. Her toplantı sonrası açıklanan karar metninde, enflasyon
+          değerlendirmesi, para politikası duruşu ve geleceğe yönelik ipuçları bulunur. Bu metinler, piyasa
+          katılımcıları tarafından dikkatle analiz edilir.
+        </p>
+      </div>
+    </article>
+  </section>
+
+  <section class="mb-8" aria-label="SSS">
+    <article class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">Sıkça Sorulan Sorular</h2>
+      <div class="space-y-4">
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-1">TCMB faiz kararı ne zaman açıklanıyor?</h3>
+          <p class="text-sm text-gray-600">PPK faiz kararları, toplantı gününde saat 14:00'te TCMB'nin resmi internet sitesinde yayımlanır.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-1">Mevcut politika faizi kaç?</h3>
+          <p class="text-sm text-gray-600">TCMB'nin güncel politika faizi %{formatTRY(currentPolicyRate)} seviyesindedir.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-1">Faiz artışı doları düşürür mü?</h3>
+          <p class="text-sm text-gray-600">Genel olarak faiz artışı TL'yi güçlendirir ve dolar kurunda düşüşe neden olabilir. Ancak kur hareketleri birçok faktöre bağlıdır ve tek başına faiz belirleyici değildir.</p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <Footer slot="footer" />
+</BaseLayout>

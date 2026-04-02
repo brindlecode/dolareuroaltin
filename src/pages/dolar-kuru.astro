@@ -1,0 +1,336 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import RateTicker from '../components/RateTicker.astro';
+import RateCard from '../components/RateCard.astro';
+import RateChart from '../components/RateChart.astro';
+import ConversionWidget from '../components/ConversionWidget.astro';
+import AffiliateBanner from '../components/AffiliateBanner.astro';
+import AdSenseSlot from '../components/AdSenseSlot.astro';
+import LastUpdated from '../components/LastUpdated.astro';
+import rates from '../data/rates_current.json';
+import historicalUsd from '../data/rates_historical_usd.json';
+import { formatTRY, formatRate, getChangeClass, getChangeIcon, formatDateFull, formatDateShort } from '../utils/rateHelpers';
+
+const usd = rates.rates.USD;
+const formattedDate = formatDateFull(rates.last_updated);
+
+const last7 = historicalUsd.data.slice(-7);
+
+const formattedMid = formatTRY(usd.mid);
+const formattedBuying = formatRate(usd.buying);
+const formattedSelling = formatRate(usd.selling);
+const formattedOpen = formatRate(usd.open);
+const formattedHigh = formatRate(usd.high);
+const formattedLow = formatRate(usd.low);
+const formattedPrevClose = formatRate(usd.prev_close);
+const formattedChange = formatRate(Math.abs(usd.change_daily));
+const formattedChangePct = Math.abs(usd.change_pct).toFixed(2).replace('.', ',');
+const changePrefix = usd.direction === 'up' ? '+' : usd.direction === 'down' ? '-' : '';
+const changeClass = usd.direction === 'up' ? 'text-emerald-600 bg-emerald-50' : usd.direction === 'down' ? 'text-red-600 bg-red-50' : 'text-gray-500 bg-gray-50';
+const changeIcon = getChangeIcon(usd.direction);
+
+const dayRangeMin = usd.low;
+const dayRangeMax = usd.high;
+const dayRangePct = ((usd.mid - dayRangeMin) / (dayRangeMax - dayRangeMin)) * 100;
+---
+
+<BaseLayout
+  title="Dolar Kuru Bugün — USD/TRY Anlık Fiyat (2026)"
+  description="Dolar kuru bugün ne kadar? USD/TRY anlık fiyat, günlük değişim, grafik ve döviz çevirici. TCMB resmi verisi ile güncel dolar kuru takibi."
+  canonical="https://dolareuroaltin.com/dolar-kuru"
+>
+  <Header slot="header" />
+
+  <RateTicker />
+
+  <section class="mb-8 mt-6" aria-label="Giriş">
+    <div class="text-center">
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
+        Dolar Kuru Bugün — USD/TRY Anlık Fiyat
+      </h1>
+      <p class="text-sm text-gray-500 mb-1">{formattedDate}</p>
+      <LastUpdated />
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="USD/TRY detaylı kur">
+    <RateCard
+      code={usd.code}
+      name_tr={usd.name_tr}
+      symbol={usd.symbol}
+      flag={usd.flag}
+      buying={usd.buying}
+      selling={usd.selling}
+      mid={usd.mid}
+      change_daily={usd.change_daily}
+      change_pct={usd.change_pct}
+      direction={usd.direction}
+      open={usd.open}
+      high={usd.high}
+      low={usd.low}
+      prev_close={usd.prev_close}
+      week_high={usd.week_high}
+      week_low={usd.week_low}
+      month_high={usd.month_high}
+      month_low={usd.month_low}
+      year_high={usd.year_high}
+      year_low={usd.year_low}
+      size="large"
+    />
+  </section>
+
+  <section class="mb-8" aria-label="USD/TRY grafik">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+      <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <span class="text-lg">{usd.flag}</span>
+        USD/TRY Grafiği
+      </h2>
+      <RateChart currency="USD" defaultPeriod="5y" height={400} />
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Gün içi fiyatlar">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-5 py-4 border-b border-gray-100">
+        <h2 class="text-lg font-bold text-gray-900">Gün İçi OHLCV</h2>
+        <p class="text-xs text-gray-400 mt-0.5">2 Nisan 2026 işlem verileri</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" role="table" aria-label="USD/TRY gün içi fiyatlar">
+          <thead>
+            <tr class="border-b border-gray-100 bg-gray-50">
+              <th class="py-3 px-5 text-left font-semibold text-gray-500 text-xs uppercase tracking-wider">Metrik</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Değer (₺)</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Değişim</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+              <td class="py-3 px-5 font-medium text-gray-700">Açılış</td>
+              <td class="py-3 px-5 text-right font-mono font-medium text-gray-900">{formattedOpen}</td>
+              <td class="py-3 px-5 text-right text-xs text-gray-400">Gün başı fiyat</td>
+            </tr>
+            <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+              <td class="py-3 px-5 font-medium text-gray-700">En Yüksek</td>
+              <td class="py-3 px-5 text-right font-mono font-medium text-emerald-600">{formattedHigh}</td>
+              <td class="py-3 px-5 text-right text-xs text-emerald-600">
+                +{formatRate(usd.high - usd.open)}
+              </td>
+            </tr>
+            <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+              <td class="py-3 px-5 font-medium text-gray-700">En Düşük</td>
+              <td class="py-3 px-5 text-right font-mono font-medium text-red-600">{formattedLow}</td>
+              <td class="py-3 px-5 text-right text-xs text-red-600">
+                {formatRate(usd.low - usd.open)}
+              </td>
+            </tr>
+            <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+              <td class="py-3 px-5 font-medium text-gray-700">Güncel (Orta)</td>
+              <td class="py-3 px-5 text-right font-mono font-bold text-gray-900">{formattedMid}</td>
+              <td class="py-3 px-5 text-right">
+                <span class={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${changeClass}`}>
+                  {changeIcon} {changePrefix}{formattedChangePct}%
+                </span>
+              </td>
+            </tr>
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="py-3 px-5 font-medium text-gray-700">Önceki Kapanış</td>
+              <td class="py-3 px-5 text-right font-mono font-medium text-gray-900">{formattedPrevClose}</td>
+              <td class="py-3 px-5 text-right text-xs text-gray-400">Dün kapanış fiyatı</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="px-5 py-3 bg-gray-50 border-t border-gray-100">
+        <div class="flex items-center justify-between text-xs text-gray-500 mb-1.5">
+          <span>{formatRate(dayRangeMin)}</span>
+          <span>Gün içi aralık</span>
+          <span>{formatRate(dayRangeMax)}</span>
+        </div>
+        <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div class="h-full bg-blue-500 rounded-full" style={`width: ${Math.min(100, Math.max(0, dayRangePct))}%`}></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Son 7 gün USD/TRY">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-5 py-4 border-b border-gray-100">
+        <h2 class="text-lg font-bold text-gray-900">Son 7 Gün USD/TRY</h2>
+        <p class="text-xs text-gray-400 mt-0.5">TCMB resmi kurları</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" role="table" aria-label="Son 7 gün dolar kuru">
+          <thead>
+            <tr class="border-b border-gray-100 bg-gray-50">
+              <th class="py-3 px-5 text-left font-semibold text-gray-500 text-xs uppercase tracking-wider">Tarih</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Açılış</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">En Yüksek</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">En Düşük</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Kapanış</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Değişim</th>
+            </tr>
+          </thead>
+          <tbody>
+            {last7.reverse().map((entry) => {
+              const dailyChange = entry.close - entry.open;
+              const dailyChangePct = (dailyChange / entry.open) * 100;
+              const isUp = dailyChange >= 0;
+              const rowClass = isUp ? 'text-emerald-600' : 'text-red-600';
+              const arrow = isUp ? '▲' : '▼';
+              const changeStr = `${isUp ? '+' : ''}${dailyChange.toFixed(4)} (${isUp ? '+' : ''}${dailyChangePct.toFixed(2).replace('.', ',')}%)`;
+              return (
+                <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                  <td class="py-3 px-5 font-medium text-gray-700">{formatDateShort(entry.date)}</td>
+                  <td class="py-3 px-5 text-right font-mono text-gray-900">{formatRate(entry.open)}</td>
+                  <td class="py-3 px-5 text-right font-mono text-emerald-600">{formatRate(entry.high)}</td>
+                  <td class="py-3 px-5 text-right font-mono text-red-600">{formatRate(entry.low)}</td>
+                  <td class="py-3 px-5 text-right font-mono font-semibold text-gray-900">{formatRate(entry.close)}</td>
+                  <td class={`py-3 px-5 text-right font-mono text-xs font-medium ${rowClass}`}>
+                    {arrow} {changeStr}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Döviz çevirici">
+    <ConversionWidget />
+  </section>
+
+  <section class="mb-8" aria-label="Dolar ne zaman düşer">
+    <article class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">Dolar Ne Zaman Düşer?</h2>
+      <div class="prose prose-gray max-w-none">
+        <p class="text-gray-600 leading-relaxed mb-4">
+          Dolar kuru (USD/TRY), birçok makroekonomik faktörün etkisiyle hareket eder. Dolar kurundaki düşüş genellikle
+          aşağıdaki koşullar altında gerçekleşebilir:
+        </p>
+        <ul class="space-y-3 text-gray-600 mb-4">
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-500 mt-1 flex-shrink-0">●</span>
+            <span><strong className="text-gray-900">Merkez Bankası faiz artırımları:</strong> TCMB'nin politika faizini yükseltmesi, Türk Lirası'nı cazip hale getirerek dolar kurunda baskı yaratabilir.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-500 mt-1 flex-shrink-0">●</span>
+            <span><strong className="text-gray-900">Enflasyonda düşüş eğilimi:</strong> Enflasyon verilerindeki iyileşme, TL'nin reel değerini destekleyerek kur üzerinde aşağı yönlü etki yapabilir.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-500 mt-1 flex-shrink-0">●</span>
+            <span><strong className="text-gray-900">Cari fazla ve ihracat artışı:</strong> Türkiye'nin dış ticaret dengesindeki iyileşme ve ihracat gelirlerindeki artış, döviz arzını artırarak kur düşüşüne katkıda bulunabilir.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-500 mt-1 flex-shrink-0">●</span>
+            <span><strong className="text-gray-900">Küresel risk iştahı:</strong> Küresel piyasalarda risk iştahının artması, gelişmekte olan ülke para birimlerine yönelik talebi yükseltebilir ve USD/TRY üzerinde aşağı yönlü baskı oluşturabilir.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-500 mt-1 flex-shrink-0">●</span>
+            <span><strong className="text-gray-900">ABD dolar endeksi (DXY) zayıflaması:</strong> Dolar endeksinin küresel çapta değer kaybetmesi, USD/TRY dahil birçok gelişmekte olan ülke kurunu olumlu etkileyebilir.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-emerald-500 mt-1 flex-shrink-0">●</span>
+            <span><strong className="text-gray-900">Jeopolitik risklerin azalması:</strong> Bölgesel ve küresel jeopolitik gerilimlerin düşmesi, Türkiye'ye yönelik yabancı sermaye girişlerini artırabilir.</span>
+          </li>
+        </ul>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          Dolar kurunun geleceği hakkında kesin bir öngörüde bulunmak mümkün değildir. Kur hareketleri; yurt içi ve yurt dışı
+          ekonomik gelişmelere, merkez bankası kararlarına ve küresel piyasa koşullarına bağlı olarak değişkenlik gösterebilir.
+          Yatırım kararlarınızı alırken birden fazla kaynaktan bilgi almanız ve kişisel risk profilinizi dikkate almanız önerilir.
+        </p>
+      </div>
+    </article>
+  </section>
+
+  <section class="mb-8" aria-label="Dolar tarihsel seyir">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-6">Dolar Tarihsel Seyrinde Önemli Noktalar</h2>
+      <div class="relative">
+        <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+        <div class="space-y-6">
+          <div class="relative pl-10">
+            <div class="absolute left-2.5 top-1.5 w-3 h-3 rounded-full bg-blue-500 ring-4 ring-blue-50"></div>
+            <div class="text-xs text-gray-400 mb-1">2021 Mart</div>
+            <h3 class="font-semibold text-gray-900 mb-1">TCMB Başkanı Değişikliği ve Kur Sıçraması</h3>
+            <p class="text-sm text-gray-600">Merkez Bankası başkanının görevden alınmasının ardından dolar kuru 7,48'den 8,18'e yükseldi. Bu dönem, kur volatilitesinin arttığı bir dönemin başlangıcı oldu.</p>
+          </div>
+          <div class="relative pl-10">
+            <div class="absolute left-2.5 top-1.5 w-3 h-3 rounded-full bg-purple-500 ring-4 ring-purple-50"></div>
+            <div class="text-xs text-gray-400 mb-1">2021 Aralık</div>
+            <h3 class="font-semibold text-gray-900 mb-1">Kur Korumalı Mevduat (KKM) Uygulaması</h3>
+            <p class="text-sm text-gray-600">Dolar kuru 10,45'ten 13,52'ye sıçradıktan sonra KKM sistemi devreye alındı. Bu uygulama, kurun kısa vadede stabilize olmasına yardımcı oldu.</p>
+          </div>
+          <div class="relative pl-10">
+            <div class="absolute left-2.5 top-1.5 w-3 h-3 rounded-full bg-amber-500 ring-4 ring-amber-50"></div>
+            <div class="text-xs text-gray-400 mb-1">2022 Haziran</div>
+            <h3 class="font-semibold text-gray-900 mb-1">16 TL Barajı Aşıldı</h3>
+            <p class="text-sm text-gray-600">Dolar kuru 14,38'den 16,68'e yükselerek yeni bir rekor seviye gördü. Küresel enerji fiyatlarındaki artış ve yerel politika belirsizlikleri kur üzerinde baskı yarattı.</p>
+          </div>
+          <div class="relative pl-10">
+            <div class="absolute left-2.5 top-1.5 w-3 h-3 rounded-full bg-emerald-500 ring-4 ring-emerald-50"></div>
+            <div class="text-xs text-gray-400 mb-1">2023 Haziran</div>
+            <h3 class="font-semibold text-gray-900 mb-1">Seçim Sonrası Ekonomi Yönetimi Değişikliği</h3>
+            <p class="text-sm text-gray-600">Genel seçimlerin ardından yeni ekonomi yönetimi göreve başladı ve ortodoks para politikasına dönüş sinyalleri verildi. Kur 19,52'den 23,12'ye yükseldi.</p>
+          </div>
+          <div class="relative pl-10">
+            <div class="absolute left-2.5 top-1.5 w-3 h-3 rounded-full bg-red-500 ring-4 ring-red-50"></div>
+            <div class="text-xs text-gray-400 mb-1">2023 Kasım</div>
+            <h3 class="font-semibold text-gray-900 mb-1">TCMB Faiz Artırım Döngüsü</h3>
+            <p class="text-sm text-gray-600">Merkez Bankası art arda faiz artışlarına gitti. Politika faizi %8,5'ten %40 seviyelerine yükseltildi. Kur 24,68'den 28,38'e çıktı.</p>
+          </div>
+          <div class="relative pl-10">
+            <div class="absolute left-2.5 top-1.5 w-3 h-3 rounded-full bg-cyan-500 ring-4 ring-cyan-50"></div>
+            <div class="text-xs text-gray-400 mb-1">2024-2025</div>
+            <h3 class="font-semibold text-gray-900 mb-1">Sıkı Para Politikası ve Kademeli Yükseliş</h3>
+            <p class="text-sm text-gray-600">TCMB'nin sıkı duruşu ve enflasyonla mücadele politikaları devam etti. Dolar kuru 30-38 bandında kademeli olarak yükseldi. Enflasyondaki düşüş eğilimi ve yabancı sermaye girişleri kur hareketlerini etkiledi.</p>
+          </div>
+          <div class="relative pl-10">
+            <div class="absolute left-2.5 top-1.5 w-3 h-3 rounded-full bg-blue-600 ring-4 ring-blue-100"></div>
+            <div class="text-xs text-gray-400 mb-1">2026 Nisan</div>
+            <h3 class="font-semibold text-gray-900 mb-1">Güncel Durum: 38,50 TL</h3>
+            <p class="text-sm text-gray-600">USD/TRY şu an 38,50 seviyesinde işlem görüyor. Piyasa katılımcıları, TCMB'nin faiz politikası ve küresel ekonomik gelişmeleri yakından takip ediyor.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="İlgili sayfalar">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-lg font-bold text-gray-900 mb-4">İlgili Sayfalar</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <a href="/euro-kuru" class="group flex items-center gap-3 p-4 rounded-xl border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all">
+          <span class="text-3xl">🇪🇺</span>
+          <div>
+            <div class="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors">Euro Kuru</div>
+            <div class="text-xs text-gray-500">EUR/TRY güncel fiyat</div>
+          </div>
+        </a>
+        <a href="/altin-fiyati" class="group flex items-center gap-3 p-4 rounded-xl border border-gray-100 hover:border-amber-200 hover:bg-amber-50 transition-all">
+          <span class="text-3xl">🪙</span>
+          <div>
+            <div class="font-semibold text-gray-900 group-hover:text-amber-700 transition-colors">Altın Fiyatı</div>
+            <div class="text-xs text-gray-500">Gram, çeyrek, tam altın</div>
+          </div>
+        </a>
+        <a href="/sterlin-kuru" class="group flex items-center gap-3 p-4 rounded-xl border border-gray-100 hover:border-cyan-200 hover:bg-cyan-50 transition-all">
+          <span class="text-3xl">🇬🇧</span>
+          <div>
+            <div class="font-semibold text-gray-900 group-hover:text-cyan-700 transition-colors">Sterlin Kuru</div>
+            <div class="text-xs text-gray-500">GBP/TRY güncel fiyat</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <AdSenseSlot size="leaderboard" />
+
+  <Footer slot="footer" />
+</BaseLayout>

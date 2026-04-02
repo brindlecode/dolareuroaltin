@@ -1,0 +1,72 @@
+---
+import rates from '../data/rates_current.json';
+
+const year = new Date().getFullYear();
+const source = rates.source;
+---
+
+<footer class="bg-gray-900 text-gray-300">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+
+      <div class="sm:col-span-2 lg:col-span-1">
+        <a href="/" class="flex items-center gap-2 text-xl font-bold text-white">
+          <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-lg font-bold">₺</span>
+          dolareuroaltin
+        </a>
+        <p class="mt-3 text-sm leading-relaxed text-gray-400">
+          Dolar, Euro, Altın ve diğer döviz kurlarının anlık ve güncel verileri.
+        </p>
+        <p class="mt-2 text-xs text-gray-500">
+          Veri kaynağı: {source}
+        </p>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-white">Kurlar</h3>
+        <ul class="mt-4 space-y-2.5">
+          <li><a href="/dolar-kuru" class="text-sm text-gray-400 hover:text-white transition-colors">Dolar Kuru</a></li>
+          <li><a href="/euro-kuru" class="text-sm text-gray-400 hover:text-white transition-colors">Euro Kuru</a></li>
+          <li><a href="/altin-fiyati" class="text-sm text-gray-400 hover:text-white transition-colors">Altın Fiyatı</a></li>
+          <li><a href="/sterlin-kuru" class="text-sm text-gray-400 hover:text-white transition-colors">Sterlin Kuru</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-white">Araçlar</h3>
+        <ul class="mt-4 space-y-2.5">
+          <li><a href="/doviz-cevirici" class="text-sm text-gray-400 hover:text-white transition-colors">Döviz Çevirici</a></li>
+          <li><a href="/gecmisteAlsaydim" class="text-sm text-gray-400 hover:text-white transition-colors">Geçmişte Alsaydım</a></li>
+          <li><a href="/tcmb-faiz-karari" class="text-sm text-gray-400 hover:text-white transition-colors">TCMB Faiz Kararı</a></li>
+          <li><a href="/enflasyon" class="text-sm text-gray-400 hover:text-white transition-colors">Enflasyon</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-white">Yasal</h3>
+        <ul class="mt-4 space-y-2.5">
+          <li><a href="/gizlilik-politikasi" class="text-sm text-gray-400 hover:text-white transition-colors">Gizlilik Politikası</a></li>
+          <li><a href="/cerez-politikasi" class="text-sm text-gray-400 hover:text-white transition-colors">Çerez Politikası</a></li>
+          <li><a href="/iletisim" class="text-sm text-gray-400 hover:text-white transition-colors">İletişim</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-10 border-t border-gray-800 pt-8">
+      <div class="rounded-lg bg-gray-800/50 p-4 mb-6">
+        <p class="text-xs leading-relaxed text-gray-400">
+          <strong class="text-gray-300">Yasal Uyarı:</strong> Bu sitedeki veriler bilgilendirme amaçlıdır, yatırım tavsiyesi değildir.
+          Yatırım kararlarınızı vermeden önce lisanslı yatırım danışmanlarına başvurmanızı öneririz.
+        </p>
+      </div>
+      <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
+        <p class="text-sm text-gray-500">
+          &copy; {year} dolareuroaltin.com — Tüm hakları saklıdır.
+        </p>
+        <p class="text-xs text-gray-600">
+          Son güncelleme: {rates.last_updated_display}
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>

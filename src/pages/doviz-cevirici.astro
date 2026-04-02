@@ -1,0 +1,235 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import RateTicker from '../components/RateTicker.astro';
+import AdSenseSlot from '../components/AdSenseSlot.astro';
+import ConversionWidget from '../components/ConversionWidget.astro';
+import rates from '../data/rates_current.json';
+import { formatTRY, formatRate, formatDateFull } from '../utils/rateHelpers';
+
+const formattedDate = formatDateFull(rates.last_updated);
+const usd = rates.rates.USD;
+const eur = rates.rates.EUR;
+const gbp = rates.rates.GBP;
+const chf = rates.rates.CHF;
+const sar = rates.rates.SAR;
+
+const popularConversions = [
+  { amount: 100, currency: 'USD', flag: '🇺🇸', rate: usd.selling },
+  { amount: 500, currency: 'USD', flag: '🇺🇸', rate: usd.selling },
+  { amount: 1000, currency: 'USD', flag: '🇺🇸', rate: usd.selling },
+  { amount: 100, currency: 'EUR', flag: '🇪🇺', rate: eur.selling },
+  { amount: 500, currency: 'EUR', flag: '🇪🇺', rate: eur.selling },
+  { amount: 1000, currency: 'EUR', flag: '🇪🇺', rate: eur.selling },
+];
+
+const goldConversions = [
+  { label: 'Gram Altın', rate: rates.gold.gram.selling },
+  { label: 'Çeyrek Altın', rate: rates.gold.ceyrek.selling },
+  { label: 'Yarım Altın', rate: rates.gold.yarim.selling },
+  { label: 'Tam Altın', rate: rates.gold.tam.selling },
+  { label: 'Ata Altın', rate: rates.gold.ata.selling },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'Döviz Çevirici',
+  url: 'https://dolareuroaltin.com/doviz-cevirici',
+  description: 'Dolar, Euro, Altın ve diğer para birimlerini anlık kurlarla dönüştürün.',
+  applicationCategory: 'FinanceApplication',
+  operatingSystem: 'Web',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'TRY',
+  },
+};
+---
+
+<BaseLayout
+  title="Döviz Çevirici — TL Dolar Euro Altın Dönüştürücü"
+  description="Döviz çevirici ile Dolar, Euro, Altın ve diğer para birimlerini anlık TCMB kurlarıyla dönüştürün. Ücretsiz döviz hesaplama aracı."
+  canonical="https://dolareuroaltin.com/doviz-cevirici"
+>
+  <Header slot="header" />
+
+  <RateTicker />
+
+  <section class="mb-8 mt-6" aria-label="Giriş">
+    <div class="text-center">
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
+        Döviz Çevirici — TL Dolar Euro Altın Dönüştürücü
+      </h1>
+      <p class="text-sm text-gray-500 mb-1">{formattedDate}</p>
+      <p class="text-xs text-gray-400">TCMB resmi kurları • Anlık hesaplama</p>
+    </div>
+  </section>
+
+  <AdSenseSlot size="leaderboard" />
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <section aria-label="Döviz çevirici">
+      <ConversionWidget />
+    </section>
+
+    <section aria-label="Altın çevirici">
+      <ConversionWidget />
+    </section>
+  </div>
+
+  <section class="mb-8" aria-label="Popüler döviz dönüşümleri">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-5 py-4 border-b border-gray-100">
+        <h2 class="text-lg font-bold text-gray-900">Popüler Dolar Çevirimleri</h2>
+        <p class="text-xs text-gray-400 mt-0.5">Güncel satış kuru üzerinden hesaplanmıştır</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" role="table" aria-label="Popüler döviz dönüşümleri">
+          <thead>
+            <tr class="border-b border-gray-100 bg-gray-50">
+              <th class="py-3 px-5 text-left font-semibold text-gray-500 text-xs uppercase tracking-wider">Tutar</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Kur</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">₺ Karşılığı</th>
+            </tr>
+          </thead>
+          <tbody>
+            {popularConversions.map((conv) => {
+              const result = conv.amount * conv.rate;
+              return (
+                <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                  <td class="py-3 px-5 font-medium text-gray-900">
+                    {conv.flag} {conv.amount.toLocaleString('tr-TR')} {conv.currency}
+                  </td>
+                  <td class="py-3 px-5 text-right font-mono text-gray-500 text-xs">
+                    1 {conv.currency} = {formatRate(conv.rate)} ₺
+                  </td>
+                  <td class="py-3 px-5 text-right font-mono font-bold text-gray-900">
+                    ₺{formatTRY(result)}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Altın fiyatları tablosu">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-5 py-4 border-b border-gray-100">
+        <h2 class="text-lg font-bold text-gray-900">Altın Fiyatları — 1 Adet Karşılığı</h2>
+        <p class="text-xs text-gray-400 mt-0.5">Satış fiyatı üzerinden hesaplanmıştır</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" role="table" aria-label="Altın fiyatları">
+          <thead>
+            <tr class="border-b border-gray-100 bg-gray-50">
+              <th class="py-3 px-5 text-left font-semibold text-gray-500 text-xs uppercase tracking-wider">Altın Türü</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Birim Fiyat</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">10 Adet</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">100 Adet</th>
+            </tr>
+          </thead>
+          <tbody>
+            {goldConversions.map((g) => (
+              <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                <td class="py-3 px-5 font-medium text-gray-900">{g.label}</td>
+                <td class="py-3 px-5 text-right font-mono text-gray-900">₺{formatTRY(g.rate)}</td>
+                <td class="py-3 px-5 text-right font-mono text-gray-600">₺{formatTRY(g.rate * 10)}</td>
+                <td class="py-3 px-5 text-right font-mono text-gray-600">₺{formatTRY(g.rate * 100)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <AdSenseSlot size="rectangle" />
+
+  <section class="mb-8" aria-label="Döviz çevirici hakkında">
+    <article class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">Döviz Çevirici Nasıl Kullanılır?</h2>
+      <div class="prose prose-gray max-w-none">
+        <p class="text-gray-600 leading-relaxed mb-4">
+          Döviz çevirici aracımız, TCMB (Türkiye Cumhuriyet Merkez Bankası) tarafından açıklanan güncel kurları kullanarak
+          para birimleri arasında hızlı ve doğru dönüşüm yapmanızı sağlar. Dolar, Euro, İngiliz Sterlini, İsviçre Frangı
+          gibi döviz cinslerinin yanı sıra gram altın, çeyrek altın, yarım altın, tam altın ve Ata altın gibi kıymetli
+          maden türlerini de Türk Lirası'na çevirebilirsiniz.
+        </p>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Döviz Çevirici Özellikleri</h3>
+        <ul class="space-y-2 text-gray-600 mb-4">
+          <li class="flex items-start gap-2">
+            <span class="text-blue-500 mt-1 flex-shrink-0">●</span>
+            <span><strong className="text-gray-900">Anlık TCMB kurları:</strong> Veriler her saat güncellenir, en güncel alış ve satış kurları kullanılır.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-blue-500 mt-1 flex-shrink-0">●</span>
+            <span><strong className="text-gray-900">Çoklu para birimi desteği:</strong> USD, EUR, GBP, CHF, SAR ve altın türleri arasında dönüşüm yapabilirsiniz.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-blue-500 mt-1 flex-shrink-0">●</span>
+            <span><strong className="text-gray-900">Hızlı tutar seçimi:</strong> 100, 500, 1.000, 5.000, 10.000 ve 50.000 TL için tek tıkla hesaplama.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-blue-500 mt-1 flex-shrink-0">●</span>
+            <span><strong className="text-gray-900">Yön değiştirme:</strong> Swap butonu ile kaynak ve hedef para birimlerini kolayca değiştirebilirsiniz.</span>
+          </li>
+        </ul>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Döviz Kuru Nedir?</h3>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          Döviz kuru, bir para biriminin başka bir para birimi cinsinden değerini ifade eder. Örneğin USD/TRY kuru,
+          1 Amerikan Doları'nın kaç Türk Lirası ettiğini gösterir. TCMB her iş günü saat 15:30'da resmi döviz kurlarını
+          açıklar. Bu kurlar; bankalar, döviz büroları ve finansal kuruluşlar tarafından referans alınır. Döviz kurları;
+          faiz oranları, enflasyon, dış ticaret dengesi, siyasi gelişmeler ve küresel piyasa koşulları gibi birçok
+          faktörden etkilenerek sürekli değişir.
+        </p>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Alış ve Satış Kuru Arasındaki Fark Nedir?</h3>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          <strong className="text-gray-900">Alış kuru (buying):</strong> Döviz alım satımı yapan kuruluşların sizden döviz alırken ödediği fiyattır.
+          Dolarınızı TL'ye çevirirken bu kur geçerli olur.
+        </p>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          <strong className="text-gray-900">Satış kuru (selling):</strong> Kuruluşların size döviz satarken talep ettiği fiyattır.
+          TL'nizle dolar veya euro almak istediğinizde bu kur uygulanır. Satış kuru her zaman alış kurundan yüksektir;
+          aradaki fark kuruluşların kâr marjını oluşturur.
+        </p>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Altın Fiyatları Nasıl Hesaplanır?</h3>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          Gram altın fiyatı, uluslararası altın ons fiyatı (XAU/USD) ile USD/TRY kurunun çarpılmasıyla bulunur.
+          Diğer altın türleri (çeyrek, yarım, tam, Ata) gram altına göre belirli ağırlık oranlarında fiyatlandırılır.
+          Çeyrek altın yaklaşık 1.75 gram, yarım altın 3.5 gram, tam altın (Cumhuriyet altını) 7 gram, Ata altın ise
+          7.2 gram saf altın içerir. Altın fiyatları ayrıca işçilik maliyeti ve piyasa arz-talep dengesi ile de
+          şekillenir.
+        </p>
+      </div>
+    </article>
+  </section>
+
+  <section class="mb-8" aria-label="SSS">
+    <article class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">Sıkça Sorulan Sorular</h2>
+      <div class="space-y-4">
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-1">Döviz çevirici ücretsiz mi?</h3>
+          <p class="text-sm text-gray-600">Evet, döviz çevirici aracımız tamamen ücretsizdir ve herhangi bir kayıt gerektirmez.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-1">Kurlar ne sıklıkla güncelleniyor?</h3>
+          <p class="text-sm text-gray-600">Kurlar TCMB verilerine dayanarak her saat güncellenir. İş günleri saat 15:30'da resmi kurlar açıklanır.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-1">Banka kurları ile aynı mı?</h3>
+          <p class="text-sm text-gray-600">Bu araç TCMB resmi kurlarını kullanır. Bankaların ve döviz bürolarının kendi kurları farklı olabilir. Gerçek işlem yapmadan önce ilgili kurumun güncel kurunu kontrol etmenizi öneririz.</p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <Footer slot="footer" />
+</BaseLayout>

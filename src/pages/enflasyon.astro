@@ -1,0 +1,304 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import RateTicker from '../components/RateTicker.astro';
+import AdSenseSlot from '../components/AdSenseSlot.astro';
+import inflationData from '../data/inflation_data.json';
+import ratesCurrent from '../data/rates_current.json';
+import { formatTRY, formatDateFull } from '../utils/rateHelpers';
+
+const formattedDate = formatDateFull(ratesCurrent.last_updated);
+
+const annualInflation: { year: number; rate: number }[] = [];
+const yearMap = new Map<number, number>();
+inflationData.data.forEach(d => {
+  if (d.month === 12 || d.year === 2026) {
+    yearMap.set(d.year, d.tüfe_annual);
+  }
+});
+if (!yearMap.has(2026) && inflationData.data.length > 0) {
+  const last = inflationData.data[inflationData.data.length - 1];
+  yearMap.set(last.year, last.tüfe_annual);
+}
+for (let y = 2020; y <= 2026; y++) {
+  if (yearMap.has(y)) {
+    annualInflation.push({ year: y, rate: yearMap.get(y)! });
+  }
+}
+
+const last12Months = inflationData.data.slice(-12);
+
+const latestInflation = inflationData.data[inflationData.data.length - 1];
+const previousInflation = inflationData.data[inflationData.data.length - 2];
+const monthlyChange = latestInflation.tüfe_annual - previousInflation.tüfe_annual;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'Türkiye Enflasyon Verileri',
+  url: 'https://dolareuroaltin.com/enflasyon',
+  description: 'Türkiye TÜFE enflasyon verileri, yıllık ve aylık enflasyon oranları, grafik ve tablo.',
+};
+---
+
+<BaseLayout
+  title="Türkiye Enflasyon Verileri — TÜFE Grafiği 2020-2026"
+  description="Türkiye enflasyon verileri: Yıllık TÜFE grafiği 2020-2026, son 12 aylık enflasyon tablosu. TÜİK resmi verileri ile güncel enflasyon takibi."
+  canonical="https://dolareuroaltin.com/enflasyon"
+>
+  <Header slot="header" />
+
+  <RateTicker />
+
+  <section class="mb-8 mt-6" aria-label="Giriş">
+    <div class="text-center">
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
+        Türkiye Enflasyon Verileri — TÜFE Grafiği 2020-2026
+      </h1>
+      <p class="text-sm text-gray-500 mb-1">{formattedDate}</p>
+      <p class="text-xs text-gray-400">TÜİK resmi verileri</p>
+    </div>
+  </section>
+
+  <AdSenseSlot size="leaderboard" />
+
+  <section class="mb-8" aria-label="Enflasyon özeti">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+        <p class="text-xs text-gray-400 mb-1">Güncel Yıllık TÜFE</p>
+        <p class="text-3xl font-bold font-mono text-gray-900">%{formatTRY(latestInflation.tüfe_annual)}</p>
+        <p class="text-xs text-gray-400 mt-1">{latestInflation.month_tr}</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+        <p class="text-xs text-gray-400 mb-1">Aylık Değişim</p>
+        <p class={`text-3xl font-bold font-mono ${monthlyChange >= 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+          {monthlyChange >= 0 ? '+' : ''}{formatTRY(monthlyChange)} puan
+        </p>
+        <p class="text-xs text-gray-400 mt-1">Önceki aya göre</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+        <p class="text-xs text-gray-400 mb-1">Son 12 Ay Ortalama</p>
+        <p class="text-3xl font-bold font-mono text-gray-900">
+          %{formatTRY(last12Months.reduce((sum, d) => sum + d.tüfe_annual, 0) / last12Months.length)}
+        </p>
+        <p class="text-xs text-gray-400 mt-1">Aylık TÜFE ortalaması</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Yıllık enflasyon grafiği">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-lg font-bold text-gray-900 mb-4">Yıllık TÜFE Enflasyonu (2020-2026)</h2>
+      <div class="h-64 sm:h-80">
+        <canvas id="inflation-chart" aria-label="Yıllık enflasyon bar grafiği" role="img"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Son 12 ay enflasyon">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-5 py-4 border-b border-gray-100">
+        <h2 class="text-lg font-bold text-gray-900">Son 12 Ay Enflasyon Verileri</h2>
+        <p class="text-xs text-gray-400 mt-0.5">TÜİK resmi TÜFE verileri</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" role="table" aria-label="Son 12 ay enflasyon">
+          <thead>
+            <tr class="border-b border-gray-100 bg-gray-50">
+              <th class="py-3 px-5 text-left font-semibold text-gray-500 text-xs uppercase tracking-wider">Ay</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Aylık %</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Yıllık %</th>
+              <th class="py-3 px-5 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">ÜFE Yıllık %</th>
+            </tr>
+          </thead>
+          <tbody>
+            {last12Months.reverse().map((entry) => {
+              const monthlyClass = entry.tüfe_monthly >= 2 ? 'text-red-600' : entry.tüfe_monthly >= 1 ? 'text-amber-600' : 'text-emerald-600';
+              return (
+                <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                  <td class="py-3 px-5 font-medium text-gray-900">{entry.month_tr}</td>
+                  <td class={`py-3 px-5 text-right font-mono font-medium ${monthlyClass}`}>
+                    %{formatTRY(entry.tüfe_monthly)}
+                  </td>
+                  <td class="py-3 px-5 text-right font-mono font-bold text-gray-900">
+                    %{formatTRY(entry.tüfe_annual)}
+                  </td>
+                  <td class="py-3 px-5 text-right font-mono text-gray-600">
+                    %{formatTRY(entry.ppi_annual)}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <AdSenseSlot size="rectangle" />
+
+  <section class="mb-8" aria-label="TÜFE nedir">
+    <article class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">TÜFE Nedir?</h2>
+      <div class="prose prose-gray max-w-none">
+        <p class="text-gray-600 leading-relaxed mb-4">
+          TÜFE (Tüketici Fiyat Endeksi), hanehalklarının satın aldığı mal ve hizmetlerin fiyatlarındaki değişimi
+          ölçen bir istatistiktir. Türkiye'de TÜİK (Türkiye İstatistik Kurumu) tarafından her ay açıklanır. TÜFE,
+          enflasyonun en yaygın göstergesi olarak kullanılır ve TCMB'nin para politikası kararlarında temel referans
+          noktasıdır.
+        </p>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">TÜFE Nasıl Hesaplanır?</h3>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          TÜİK, hanehalkı tüketim harcamalarını temsil eden bir "sepet" oluşturur. Bu sepette gıda, giyim, konut,
+          ulaşım, sağlık, eğitim, eğlence gibi ana harcama grupları yer alır. Her ay bu sepetteki mal ve hizmetlerin
+          fiyatları toplanarak endeks hesaplanır. Aylık enflasyon, endeksin bir önceki aya göre değişimi; yıllık
+          enflasyon ise aynı ayın bir önceki yıla göre değişimi olarak ifade edilir.
+        </p>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">TÜFE ile ÜFE Arasındaki Fark</h3>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          <strong className="text-gray-900">TÜFE (Tüketici Fiyat Endeksi):</strong> Son tüketici fiyatlarındaki değişimi ölçer.
+          Vatandaşların günlük hayatta karşılaştığı fiyat artışlarını yansıtır.
+        </p>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          <strong className="text-gray-900">ÜFE (Üretici Fiyat Endeksi):</strong> Üretici düzeyindeki fiyat değişimlerini ölçer.
+          Sanayi üreticilerinin satış fiyatlarındaki değişimi gösterir ve genellikle TÜFE'ye öncü bir gösterge olarak
+          kabul edilir. ÜFE'deki artışlar, zamanla TÜFE'ye de yansıyabilir.
+        </p>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Enflasyonun Yatırımlara Etkisi</h3>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          Yüksek enflasyon, paranın satın alma gücünü eritir. Bu nedenle yatırımcılar, enflasyonun üzerinde getiri
+          sağlayan varlıklara yönelir. Türkiye'de döviz (dolar, euro), altın, gayrimenkul ve hisse senedi gibi
+          varlıklar enflasyona karşı korunma aracı olarak değerlendirilir. Yatırım kararlarınızda nominal getiriyi
+          değil, enflasyondan arındırılmış reel getiriyi dikkate almanız önemlidir.
+        </p>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Türkiye'de Enflasyon Trendi (2020-2026)</h3>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          2020 yılında %{formatTRY(annualInflation.find(d => d.year === 2020)?.rate ?? 0)} seviyesinde olan yıllık enflasyon,
+          2021'de %{formatTRY(annualInflation.find(d => d.year === 2021)?.rate ?? 0)}'e, 2022'de ise %{formatTRY(annualInflation.find(d => d.year === 2022)?.rate ?? 0)}
+          zirvesine ulaşmıştır. 2023'te sıkı para politikası ile düşüş eğilimine giren enflasyon, 2024-2025 döneminde
+          kademeli olarak gerilemiş ve 2026 Şubat itibarıyla %{formatTRY(latestInflation.tüfe_annual)} seviyesine
+          inmiştir. TCMB'nin hedefi, enflasyonu orta vadede tek haneli seviyelere indirmektir.
+        </p>
+      </div>
+    </article>
+  </section>
+
+  <section class="mb-8" aria-label="SSS">
+    <article class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">Sıkça Sorulan Sorular</h2>
+      <div class="space-y-4">
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-1">TÜFE verileri ne zaman açıklanıyor?</h3>
+          <p class="text-sm text-gray-600">TÜİK, TÜFE verilerini her ayın ilk iş günü saat 10:00'da açıklar.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-1">Güncel enflasyon oranı kaç?</h3>
+          <p class="text-sm text-gray-600">Son açıklanan verilere göre yıllık TÜFE %{formatTRY(latestInflation.tüfe_annual)} seviyesindedir ({latestInflation.month_tr}).</p>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-1">Enflasyondan nasıl korunabilirim?</h3>
+          <p class="text-sm text-gray-600">Döviz, altın, gayrimenkul ve hisse senedi gibi varlıklar enflasyona karşı korunma aracı olarak kullanılabilir. Yatırım kararlarınızı çeşitlendirilmiş bir portföy ile almanız önerilir.</p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<script define:vars={{ annualData: annualInflation, latestRate: latestInflation.tüfe_annual }} client:load>
+  const canvas = document.getElementById('inflation-chart') as HTMLCanvasElement;
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.parentElement!.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+  ctx.scale(dpr, dpr);
+
+  const width = rect.width;
+  const height = rect.height;
+  const padding = { top: 20, right: 20, bottom: 50, left: 50 };
+  const chartWidth = width - padding.left - padding.right;
+  const chartHeight = height - padding.top - padding.bottom;
+
+  const data = annualData as { year: number; rate: number }[];
+  const maxRate = Math.max(...data.map(d => d.rate)) * 1.1;
+
+  const barWidth = chartWidth / data.length * 0.6;
+  const barGap = chartWidth / data.length * 0.4;
+
+  function getBarColor(rate: number): string {
+    if (rate >= 60) return '#DC2626';
+    if (rate >= 40) return '#F97316';
+    if (rate >= 20) return '#EAB308';
+    if (rate >= 15) return '#22C55E';
+    return '#3B82F6';
+  }
+
+  ctx.clearRect(0, 0, width, height);
+
+  const gridLines = 5;
+  for (let i = 0; i <= gridLines; i++) {
+    const y = padding.top + (chartHeight / gridLines) * i;
+    const value = maxRate - (maxRate / gridLines) * i;
+    ctx.strokeStyle = '#F3F4F6';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padding.left, y);
+    ctx.lineTo(width - padding.right, y);
+    ctx.stroke();
+
+    ctx.fillStyle = '#9CA3AF';
+    ctx.font = '11px Inter, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(`%${Math.round(value)}`, padding.left - 8, y + 4);
+  }
+
+  data.forEach((d, i) => {
+    const x = padding.left + (chartWidth / data.length) * i + barGap / 2;
+    const barHeight = (d.rate / maxRate) * chartHeight;
+    const y = padding.top + chartHeight - barHeight;
+
+    ctx.fillStyle = getBarColor(d.rate);
+    ctx.beginPath();
+    const radius = 4;
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + barWidth - radius, y);
+    ctx.quadraticCurveTo(x + barWidth, y, x + barWidth, y + radius);
+    ctx.lineTo(x + barWidth, padding.top + chartHeight);
+    ctx.lineTo(x, padding.top + chartHeight);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.fill();
+
+    ctx.fillStyle = '#374151';
+    ctx.font = 'bold 11px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`%${d.rate}`, x + barWidth / 2, y - 6);
+
+    ctx.fillStyle = '#6B7280';
+    ctx.font = '12px Inter, sans-serif';
+    ctx.fillText(String(d.year), x + barWidth / 2, padding.top + chartHeight + 20);
+  });
+
+  ctx.fillStyle = '#9CA3AF';
+  ctx.font = '11px Inter, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Yıllık TÜFE Enflasyon Oranı (%)', width / 2, height - 5);
+</script>
+
+<style>
+  canvas {
+    width: 100%;
+    height: 100%;
+  }
+</style>

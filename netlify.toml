@@ -1,0 +1,33 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[headers]]
+  for = "/data/*.json"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Cache-Control = "public, max-age=1800, stale-while-revalidate=3600"
+
+[[redirects]]
+  from = "/dolar"
+  to = "/dolar-kuru"
+  status = 301
+
+[[redirects]]
+  from = "/euro"
+  to = "/euro-kuru"
+  status = 301
+
+[[redirects]]
+  from = "/altin"
+  to = "/altin-fiyati"
+  status = 301

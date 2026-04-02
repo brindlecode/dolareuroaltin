@@ -1,0 +1,31 @@
+name: Update Historical Data
+
+on:
+  schedule:
+    - cron: '30 17 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - run: pip install requests
+
+      - run: python src/scripts/fetch-historical.py
+
+      - name: Commit historical data
+        run: |
+          git diff --quiet src/data/ && exit 0
+          git config --local user.email "bot@dolareuroaltin.com"
+          git config --local user.name "Tarih Bot"
+          git add src/data/rates_historical_*.json
+          git commit -m "tarih: $(date +'%d.%m.%Y') kapanış verileri eklendi"
+          git push

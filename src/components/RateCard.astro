@@ -1,0 +1,247 @@
+---
+import { getChangeClass, getChangeIcon, formatRate, formatTRY } from '../utils/rateHelpers';
+
+interface Props {
+  code: string;
+  name_tr: string;
+  symbol: string;
+  flag: string;
+  buying: number;
+  selling: number;
+  mid: number;
+  change_daily: number;
+  change_pct: number;
+  direction: 'up' | 'down' | 'neutral';
+  open: number;
+  high: number;
+  low: number;
+  prev_close: number;
+  week_high?: number;
+  week_low?: number;
+  month_high?: number;
+  month_low?: number;
+  year_high?: number;
+  year_low?: number;
+  size?: 'large' | 'medium' | 'small';
+  sparklineSvg?: string;
+}
+
+const {
+  code,
+  name_tr,
+  symbol,
+  flag,
+  buying,
+  selling,
+  mid,
+  change_daily,
+  change_pct,
+  direction,
+  open,
+  high,
+  low,
+  prev_close,
+  week_high,
+  week_low,
+  month_high,
+  month_low,
+  year_high,
+  year_low,
+  size = 'medium',
+  sparklineSvg,
+} = Astro.props;
+
+const changeClass = getChangeClass(direction);
+const changeIcon = getChangeIcon(direction);
+
+const formattedMid = formatTRY(mid);
+const formattedBuying = formatRate(buying);
+const formattedSelling = formatRate(selling);
+const formattedChange = formatRate(Math.abs(change_daily));
+const formattedChangePct = Math.abs(change_pct).toFixed(2).replace('.', ',');
+const formattedOpen = formatRate(open);
+const formattedHigh = formatRate(high);
+const formattedLow = formatRate(low);
+const formattedPrevClose = formatRate(prev_close);
+
+const ariaLabel = `${name_tr} kuru ${formattedMid} Türk Lirası, ${direction === 'up' ? 'artış' : direction === 'down' ? 'düşüş' : 'değişim yok'}`;
+
+const changePrefix = direction === 'up' ? '+' : direction === 'down' ? '-' : '';
+---
+
+{size === 'small' && (
+  <tr
+    class="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+    aria-label={ariaLabel}
+  >
+    <td class="py-2.5 px-3">
+      <div class="flex items-center gap-2">
+        <span class="text-lg">{flag}</span>
+        <div>
+          <span class="font-semibold text-sm text-gray-900">{code}</span>
+          <span class="text-xs text-gray-500 ml-1.5">{name_tr}</span>
+        </div>
+      </div>
+    </td>
+    <td class="py-2.5 px-3 text-right">
+      <span class="font-mono text-sm font-medium text-gray-900">{formattedBuying}</span>
+    </td>
+    <td class="py-2.5 px-3 text-right">
+      <span class="font-mono text-sm font-medium text-gray-900">{formattedSelling}</span>
+    </td>
+    <td class="py-2.5 px-3 text-right">
+      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium {changeClass}">
+        {changeIcon} {changePrefix}{formattedChangePct}%
+      </span>
+    </td>
+  </tr>
+)}
+
+{size === 'medium' && (
+  <div
+    class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md hover:border-gray-200 transition-all duration-200 cursor-pointer"
+    aria-label={ariaLabel}
+  >
+    <div class="flex items-start justify-between mb-3">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">{flag}</span>
+        <div>
+          <div class="font-bold text-gray-900">{code}</div>
+          <div class="text-xs text-gray-500">{name_tr}</div>
+        </div>
+      </div>
+      {sparklineSvg && (
+        <div class="w-16 h-8 opacity-70" set:html={sparklineSvg}></div>
+      )}
+    </div>
+
+    <div class="mb-3">
+      <div class="flex items-baseline gap-1">
+        <span class="text-xs text-gray-400">₺</span>
+        <span class="text-2xl font-bold font-mono text-gray-900">{formattedMid}</span>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-1.5">
+        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold {changeClass}">
+          {changeIcon} {changePrefix}{formattedChangePct}%
+        </span>
+      </div>
+      <div class="text-xs text-gray-400">
+        <span class="text-gray-500">Alış:</span> {formattedBuying}
+        <span class="mx-1">·</span>
+        <span class="text-gray-500">Satış:</span> {formattedSelling}
+      </div>
+    </div>
+  </div>
+)}
+
+{size === 'large' && (
+  <div
+    class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+    aria-label={ariaLabel}
+  >
+    <div class="p-6">
+      <div class="flex items-start justify-between mb-6">
+        <div class="flex items-center gap-4">
+          <span class="text-4xl">{flag}</span>
+          <div>
+            <h2 class="text-xl font-bold text-gray-900">{name_tr}</h2>
+            <span class="inline-block mt-1 px-2.5 py-0.5 bg-gray-100 text-gray-600 text-sm font-mono rounded-md">{code}</span>
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="text-3xl font-bold font-mono text-gray-900">₺{formattedMid}</div>
+          <div class="inline-flex items-center gap-1.5 mt-1.5 px-3 py-1 rounded-lg text-sm font-semibold {changeClass}">
+            {changeIcon}
+            <span>{changePrefix}{formattedChange} ({changePrefix}{formattedChangePct}%)</span>
+          </div>
+        </div>
+      </div>
+
+      {sparklineSvg && (
+        <div class="mb-6 p-4 bg-gray-50 rounded-xl">
+          <div class="h-16" set:html={sparklineSvg}></div>
+        </div>
+      )}
+
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="bg-blue-50 rounded-xl p-4">
+          <div class="text-xs text-blue-600 font-medium mb-1">Alış</div>
+          <div class="text-lg font-mono font-semibold text-blue-900">₺{formattedBuying}</div>
+        </div>
+        <div class="bg-purple-50 rounded-xl p-4">
+          <div class="text-xs text-purple-600 font-medium mb-1">Satış</div>
+          <div class="text-lg font-mono font-semibold text-purple-900">₺{formattedSelling}</div>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-100 pt-5">
+        <h3 class="text-sm font-semibold text-gray-700 mb-3">Gün İçi</h3>
+        <div class="grid grid-cols-4 gap-4">
+          <div>
+            <div class="text-xs text-gray-400 mb-1">Açılış</div>
+            <div class="font-mono text-sm font-medium text-gray-900">{formattedOpen}</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-400 mb-1">En Yüksek</div>
+            <div class="font-mono text-sm font-medium text-emerald-600">{formattedHigh}</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-400 mb-1">En Düşük</div>
+            <div class="font-mono text-sm font-medium text-red-600">{formattedLow}</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-400 mb-1">Önceki Kapanış</div>
+            <div class="font-mono text-sm font-medium text-gray-900">{formattedPrevClose}</div>
+          </div>
+        </div>
+      </div>
+
+      {(week_high || month_high || year_high) && (
+        <div class="border-t border-gray-100 pt-5 mt-5">
+          <h3 class="text-sm font-semibold text-gray-700 mb-3">Periyot Aralıkları</h3>
+          <div class="space-y-3">
+            {week_high && week_low && (
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-500">Hafta</span>
+                <div class="flex items-center gap-4">
+                  <span class="font-mono text-sm text-red-500">{formatRate(week_low)}</span>
+                  <div class="w-32 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-blue-500 rounded-full" style={`width: ${Math.min(100, Math.max(0, ((mid - week_low) / (week_high - week_low)) * 100))}%`}></div>
+                  </div>
+                  <span class="font-mono text-sm text-emerald-500">{formatRate(week_high)}</span>
+                </div>
+              </div>
+            )}
+            {month_high && month_low && (
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-500">Ay</span>
+                <div class="flex items-center gap-4">
+                  <span class="font-mono text-sm text-red-500">{formatRate(month_low)}</span>
+                  <div class="w-32 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-blue-500 rounded-full" style={`width: ${Math.min(100, Math.max(0, ((mid - month_low) / (month_high - month_low)) * 100))}%`}></div>
+                  </div>
+                  <span class="font-mono text-sm text-emerald-500">{formatRate(month_high)}</span>
+                </div>
+              </div>
+            )}
+            {year_high && year_low && (
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-500">Yıl</span>
+                <div class="flex items-center gap-4">
+                  <span class="font-mono text-sm text-red-500">{formatRate(year_low)}</span>
+                  <div class="w-32 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-blue-500 rounded-full" style={`width: ${Math.min(100, Math.max(0, ((mid - year_low) / (year_high - year_low)) * 100))}%`}></div>
+                  </div>
+                  <span class="font-mono text-sm text-emerald-500">{formatRate(year_high)}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+)}

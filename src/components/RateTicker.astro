@@ -1,0 +1,110 @@
+---
+import rates from '../data/rates_current.json';
+import { formatTRY, getChangeIcon } from '../utils/rateHelpers';
+
+const allRates = [
+  { flag: rates.rates.USD.flag, name: 'Dolar', value: rates.rates.USD.mid, change: rates.rates.USD.change_pct },
+  { flag: rates.rates.EUR.flag, name: 'Euro', value: rates.rates.EUR.mid, change: rates.rates.EUR.change_pct },
+  { flag: '🥇', name: 'Gram Altın', value: rates.gold.gram.mid, change: rates.gold.gram.change_pct },
+  { flag: rates.rates.GBP.flag, name: 'Sterlin', value: rates.rates.GBP.mid, change: rates.rates.GBP.change_pct },
+  { flag: rates.rates.CHF.flag, name: 'İsviçre Frangı', value: rates.rates.CHF.mid, change: rates.rates.CHF.change_pct },
+];
+
+function renderRates() {
+  return allRates.map(r => {
+    const icon = r.change >= 0 ? '▲' : '▼';
+    const colorClass = r.change >= 0 ? 'positive' : 'negative';
+    const formattedValue = new Intl.NumberFormat('tr-TR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(r.value);
+    return `<span class="rate-pair">
+      <span class="rate-flag">${r.flag}</span>
+      <span class="rate-name">${r.name}:</span>
+      <span class="rate-value">${formattedValue} ₺</span>
+      <span class="rate-change ${colorClass}">${icon}%${Math.abs(r.change).toFixed(2)}</span>
+    </span>`;
+  }).join('');
+}
+
+const ratesHTML = renderRates();
+---
+
+<div class="rate-ticker">
+  <div class="ticker-content">
+    <div class="ticker-track" set:html={ratesHTML + ratesHTML}></div>
+  </div>
+</div>
+
+<style>
+  .rate-ticker {
+    background-color: #1B2A4A;
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 8px 0;
+  }
+
+  .ticker-content {
+    display: flex;
+    width: 100%;
+  }
+
+  .ticker-track {
+    display: flex;
+    animation: ticker-scroll 30s linear infinite;
+  }
+
+  .ticker-track:hover {
+    animation-play-state: paused;
+  }
+
+  .rate-pair {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: white;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    padding: 0 24px;
+  }
+
+  .rate-flag {
+    margin-right: 2px;
+  }
+
+  .rate-name {
+    font-weight: 500;
+  }
+
+  .rate-value {
+    font-weight: 600;
+    margin: 0 2px;
+  }
+
+  .rate-change.positive {
+    color: #4ade80;
+  }
+
+  .rate-change.negative {
+    color: #f87171;
+  }
+
+  @keyframes ticker-scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .ticker-track {
+      animation-duration: 45s;
+    }
+
+    .rate-pair {
+      font-size: 0.75rem;
+    }
+  }
+</style>

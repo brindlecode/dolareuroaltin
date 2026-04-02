@@ -1,0 +1,312 @@
+{
+  "last_updated": "2026-04-02",
+  "source": "TCMB, TÜİK, Bloomberg HT",
+  "events": [
+    {
+      "date": "2026-04-03",
+      "time": "10:00",
+      "title_tr": "TCMB Piyasa Katılımcıları Anketi",
+      "type": "tcmb",
+      "importance": "medium",
+      "description_tr": "TCMB'nin aylık piyasa katılımcıları anketi sonuçları açıklandı. Enflasyon ve faiz beklentileri takip ediliyor."
+    },
+    {
+      "date": "2026-04-10",
+      "time": "14:00",
+      "title_tr": "TCMB Faiz Kararı",
+      "type": "tcmb",
+      "importance": "high",
+      "current_rate": 42.50,
+      "forecast_tr": "42.50 (değişim beklenmiyor)",
+      "description_tr": "Türkiye Cumhuriyet Merkez Bankası Para Politikası Kurulu (PPK) faiz kararı. Piyasalar politika faizinin %42.50'de sabit tutulmasını bekliyor."
+    },
+    {
+      "date": "2026-04-15",
+      "time": "10:00",
+      "title_tr": "TÜFE Verisi (Mart 2026)",
+      "type": "tuik",
+      "importance": "high",
+      "description_tr": "TÜİK Mart 2026 tüketici fiyat endeksi (TÜFE) verisi açıklanacak. Yıllık enflasyon beklentisi %38-40 aralığında."
+    },
+    {
+      "date": "2026-04-17",
+      "time": "10:00",
+      "title_tr": "ÜFE Verisi (Mart 2026)",
+      "type": "tuik",
+      "importance": "medium",
+      "description_tr": "TÜİK Mart 2026 üretici fiyat endeksi (ÜFE) verisi açıklanacak."
+    },
+    {
+      "date": "2026-04-22",
+      "time": "09:30",
+      "title_tr": "TCMB Finansal İstikrar Raporu",
+      "type": "tcmb",
+      "importance": "medium",
+      "description_tr": "TCMB'nin altı aylık Finansal İstikrar Raporu yayımlanacak. Bankacılık sektörü ve kredi büyümesi değerlendirmeleri içerecek."
+    },
+    {
+      "date": "2026-05-05",
+      "time": "10:00",
+      "title_tr": "TÜFE Verisi (Nisan 2026)",
+      "type": "tuik",
+      "importance": "high",
+      "description_tr": "TÜİK Nisan 2026 tüketici fiyat endeksi (TÜFE) verisi açıklanacak."
+    },
+    {
+      "date": "2026-05-08",
+      "time": "14:00",
+      "title_tr": "TCMB Faiz Kararı",
+      "type": "tcmb",
+      "importance": "high",
+      "current_rate": 42.50,
+      "forecast_tr": "42.50 (değişim beklenmiyor)",
+      "description_tr": "TCMB Para Politikası Kurulu (PPK) faiz kararı. Sıkı para politikası duruşunun korunması bekleniyor."
+    },
+    {
+      "date": "2026-05-15",
+      "time": "10:00",
+      "title_tr": "ÜFE Verisi (Nisan 2026)",
+      "type": "tuik",
+      "importance": "medium",
+      "description_tr": "TÜİK Nisan 2026 üretici fiyat endeksi (ÜFE) verisi açıklanacak."
+    },
+    {
+      "date": "2026-05-20",
+      "time": "10:00",
+      "title_tr": "TCMB Piyasa Katılımcıları Anketi",
+      "type": "tcmb",
+      "importance": "medium",
+      "description_tr": "TCMB'nin aylık piyasa katılımcıları anketi sonuçları."
+    },
+    {
+      "date": "2026-05-28",
+      "time": "10:00",
+      "title_tr": "TCMB Enflasyon Raporu",
+      "type": "tcmb",
+      "importance": "high",
+      "description_tr": "TCMB çeyreklik Enflasyon Raporu yayımlanacak. Büyüme ve enflasyon projeksiyonları güncellenecek. Başkan basın toplantısı düzenleyecek."
+    },
+    {
+      "date": "2026-06-03",
+      "time": "10:00",
+      "title_tr": "TÜFE Verisi (Mayıs 2026)",
+      "type": "tuik",
+      "importance": "high",
+      "description_tr": "TÜİK Mayıs 2026 tüketici fiyat endeksi (TÜFE) verisi açıklanacak."
+    },
+    {
+      "date": "2026-06-12",
+      "time": "14:00",
+      "title_tr": "TCMB Faiz Kararı",
+      "type": "tcmb",
+      "importance": "high",
+      "current_rate": 42.50,
+      "forecast_tr": "42.50 (değişim beklenmiyor)",
+      "description_tr": "TCMB Para Politikası Kurulu (PPK) faiz kararı. Enflasyondaki düşüş eğilimine göre politika faizi değerlendirilecek."
+    },
+    {
+      "date": "2026-06-17",
+      "time": "10:00",
+      "title_tr": "ÜFE Verisi (Mayıs 2026)",
+      "type": "tuik",
+      "importance": "medium",
+      "description_tr": "TÜİK Mayıs 2026 üretici fiyat endeksi (ÜFE) verisi açıklanacak."
+    },
+    {
+      "date": "2026-06-25",
+      "time": "09:00",
+      "title_tr": "Bütçe Açığı Verisi (Mayıs 2026)",
+      "type": "hazine",
+      "importance": "medium",
+      "description_tr": "Hazine ve Maliye Bakanlığı Mayıs 2026 bütçe dengeleri verisi açıklanacak."
+    },
+    {
+      "date": "2026-07-03",
+      "time": "10:00",
+      "title_tr": "TÜFE Verisi (Haziran 2026)",
+      "type": "tuik",
+      "importance": "high",
+      "description_tr": "TÜİK Haziran 2026 tüketici fiyat endeksi (TÜFE) verisi açıklanacak."
+    },
+    {
+      "date": "2026-07-10",
+      "time": "14:00",
+      "title_tr": "TCMB Faiz Kararı",
+      "type": "tcmb",
+      "importance": "high",
+      "current_rate": 42.50,
+      "forecast_tr": "40.00-42.50 aralığı değerlendirilecek",
+      "description_tr": "TCMB Para Politikası Kurulu (PPK) faiz kararı. Yaz döneminde enflasyon verilerine göre politika sıkılaştırması veya gevşemesi tartışılıyor."
+    },
+    {
+      "date": "2026-07-17",
+      "time": "10:00",
+      "title_tr": "ÜFE Verisi (Haziran 2026)",
+      "type": "tuik",
+      "importance": "medium",
+      "description_tr": "TÜİK Haziran 2026 üretici fiyat endeksi (ÜFE) verisi açıklanacak."
+    },
+    {
+      "date": "2026-07-22",
+      "time": "10:00",
+      "title_tr": "TCMB Piyasa Katılımcıları Anketi",
+      "type": "tcmb",
+      "importance": "medium",
+      "description_tr": "TCMB'nin aylık piyasa katılımcıları anketi sonuçları."
+    },
+    {
+      "date": "2026-08-04",
+      "time": "10:00",
+      "title_tr": "TÜFE Verisi (Temmuz 2026)",
+      "type": "tuik",
+      "importance": "high",
+      "description_tr": "TÜİK Temmuz 2026 tüketici fiyat endeksi (TÜFE) verisi açıklanacak."
+    },
+    {
+      "date": "2026-08-14",
+      "time": "14:00",
+      "title_tr": "TCMB Faiz Kararı",
+      "type": "tcmb",
+      "importance": "high",
+      "current_rate": 42.50,
+      "forecast_tr": "40.00 (indirim beklentisi)",
+      "description_tr": "TCMB Para Politikası Kurulu (PPK) faiz kararı. Enflasyondaki düşüş sürerse faiz indirimi gündeme gelebilir."
+    },
+    {
+      "date": "2026-08-19",
+      "time": "10:00",
+      "title_tr": "ÜFE Verisi (Temmuz 2026)",
+      "type": "tuik",
+      "importance": "medium",
+      "description_tr": "TÜİK Temmuz 2026 üretici fiyat endeksi (ÜFE) verisi açıklanacak."
+    },
+    {
+      "date": "2026-08-28",
+      "time": "10:00",
+      "title_tr": "TCMB Enflasyon Raporu",
+      "type": "tcmb",
+      "importance": "high",
+      "description_tr": "TCMB çeyreklik Enflasyon Raporu yayımlanacak. Yıl sonu enflasyon tahmini ve politika yol haritası paylaşılacak."
+    },
+    {
+      "date": "2026-09-03",
+      "time": "10:00",
+      "title_tr": "TÜFE Verisi (Ağustos 2026)",
+      "type": "tuik",
+      "importance": "high",
+      "description_tr": "TÜİK Ağustos 2026 tüketici fiyat endeksi (TÜFE) verisi açıklanacak."
+    },
+    {
+      "date": "2026-09-11",
+      "time": "14:00",
+      "title_tr": "TCMB Faiz Kararı",
+      "type": "tcmb",
+      "importance": "high",
+      "current_rate": 42.50,
+      "forecast_tr": "40.00 (indirim beklentisi)",
+      "description_tr": "TCMB Para Politikası Kurulu (PPK) faiz kararı. Enflasyon hedefine yaklaşılırsa gevşeme adımları devam edebilir."
+    },
+    {
+      "date": "2026-09-17",
+      "time": "10:00",
+      "title_tr": "ÜFE Verisi (Ağustos 2026)",
+      "type": "tuik",
+      "importance": "medium",
+      "description_tr": "TÜİK Ağustos 2026 üretici fiyat endeksi (ÜFE) verisi açıklanacak."
+    },
+    {
+      "date": "2026-10-03",
+      "time": "10:00",
+      "title_tr": "TÜFE Verisi (Eylül 2026)",
+      "type": "tuik",
+      "importance": "high",
+      "description_tr": "TÜİK Eylül 2026 tüketici fiyat endeksi (TÜFE) verisi açıklanacak."
+    },
+    {
+      "date": "2026-10-09",
+      "time": "14:00",
+      "title_tr": "TCMB Faiz Kararı",
+      "type": "tcmb",
+      "importance": "high",
+      "current_rate": 42.50,
+      "forecast_tr": "37.50-40.00 aralığı değerlendirilecek",
+      "description_tr": "TCMB Para Politikası Kurulu (PPK) faiz kararı. Enflasyon trendine göre politika faizi gözden geçirilecek."
+    },
+    {
+      "date": "2026-10-17",
+      "time": "10:00",
+      "title_tr": "ÜFE Verisi (Eylül 2026)",
+      "type": "tuik",
+      "importance": "medium",
+      "description_tr": "TÜİK Eylül 2026 üretici fiyat endeksi (ÜFE) verisi açıklanacak."
+    },
+    {
+      "date": "2026-10-24",
+      "time": "10:00",
+      "title_tr": "TCMB Piyasa Katılımcıları Anketi",
+      "type": "tcmb",
+      "importance": "medium",
+      "description_tr": "TCMB'nin aylık piyasa katılımcıları anketi sonuçları."
+    },
+    {
+      "date": "2026-11-04",
+      "time": "10:00",
+      "title_tr": "TÜFE Verisi (Ekim 2026)",
+      "type": "tuik",
+      "importance": "high",
+      "description_tr": "TÜİK Ekim 2026 tüketici fiyat endeksi (TÜFE) verisi açıklanacak."
+    },
+    {
+      "date": "2026-11-13",
+      "time": "14:00",
+      "title_tr": "TCMB Faiz Kararı",
+      "type": "tcmb",
+      "importance": "high",
+      "current_rate": 42.50,
+      "forecast_tr": "37.50 (indirim beklentisi)",
+      "description_tr": "TCMB Para Politikası Kurulu (PPK) faiz kararı. Enflasyondaki düşüş sürerse gevşeme politikası devam edebilir."
+    },
+    {
+      "date": "2026-11-19",
+      "time": "10:00",
+      "title_tr": "ÜFE Verisi (Ekim 2026)",
+      "type": "tuik",
+      "importance": "medium",
+      "description_tr": "TÜİK Ekim 2026 üretici fiyat endeksi (ÜFE) verisi açıklanacak."
+    },
+    {
+      "date": "2026-11-27",
+      "time": "10:00",
+      "title_tr": "TCMB Enflasyon Raporu",
+      "type": "tcmb",
+      "importance": "high",
+      "description_tr": "TCMB çeyreklik Enflasyon Raporu yayımlanacak. 2027 yılı enflasyon tahmini ve politika perspektifi paylaşılacak."
+    },
+    {
+      "date": "2026-12-03",
+      "time": "10:00",
+      "title_tr": "TÜFE Verisi (Kasım 2026)",
+      "type": "tuik",
+      "importance": "high",
+      "description_tr": "TÜİK Kasım 2026 tüketici fiyat endeksi (TÜFE) verisi açıklanacak."
+    },
+    {
+      "date": "2026-12-11",
+      "time": "14:00",
+      "title_tr": "TCMB Faiz Kararı",
+      "type": "tcmb",
+      "importance": "high",
+      "current_rate": 42.50,
+      "forecast_tr": "35.00-37.50 aralığı değerlendirilecek",
+      "description_tr": "TCMB Para Politikası Kurulu (PPK) yılın son faiz kararı. Enflasyon hedefine yaklaşılırsa faiz indirimleri devam edebilir."
+    },
+    {
+      "date": "2026-12-17",
+      "time": "10:00",
+      "title_tr": "ÜFE Verisi (Kasım 2026)",
+      "type": "tuik",
+      "importance": "medium",
+      "description_tr": "TÜİK Kasım 2026 üretici fiyat endeksi (ÜFE) verisi açıklanacak."
+    }
+  ]
+}

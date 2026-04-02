@@ -1,0 +1,313 @@
+---
+import { getChartColor, getChartLabel, aggregateDataForPeriod } from '../utils/chartHelpers';
+import { getPeriodData } from '../utils/rateHelpers';
+
+interface Props {
+  currency: string;
+  defaultPeriod?: string;
+  height?: number;
+}
+
+const { currency, defaultPeriod = '1y', height = 300 } = Astro.props;
+
+const periodMap: Record<string, string> = {
+  '7d': '7G',
+  '30d': '1A',
+  '3m': '3A',
+  '6m': '6A',
+  '1y': '1Y',
+  '5y': '5Y',
+};
+
+const periods = ['7d', '30d', '3m', '6m', '1y', '5y'];
+const chartId = `chart-${currency.toLowerCase()}-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<div class="rate-chart-wrapper" style={`height: ${height}px`}>
+  <div class="period-tabs">
+    {periods.map((period) => (
+      <button
+        class={`period-tab ${period === defaultPeriod ? 'active' : ''}`}
+        data-period={period}
+        data-chart-id={chartId}
+      >
+        {periodMap[period]}
+      </button>
+    ))}
+  </div>
+  <div class="chart-container">
+    <canvas id={chartId}></canvas>
+  </div>
+  <div class="high-low" id={`${chartId}-highlow`}></div>
+</div>
+
+<script is:inline>
+  window.initRateChart = function(chartId, currency, initialPeriod, height) {
+    const chartColors = {
+      'USD': '#3b82f6',
+      'EUR': '#8b5cf6',
+      'GBP': '#f59e0b',
+      'GOLD': '#ef4444',
+    };
+
+    const color = chartColors[currency] || '#3b82f6';
+    let chartInstance = null;
+
+    function loadPeriodData(period) {
+      const dataModule = window.__rateData || {};
+      const dataKey = currency === 'GOLD' ? 'GOLD' : currency;
+      const fullData = dataModule[dataKey] || [];
+
+      if (fullData.length === 0) {
+        console.warn('No historical data found for', currency);
+        return { labels: [], values: [] };
+      }
+
+      const filtered = getPeriodData(fullData, period);
+      const aggregated = aggregateDataForPeriod(filtered, period);
+
+      return {
+        labels: aggregated.map(d => d.date),
+        values: aggregated.map(d => d.rate),
+      };
+    }
+
+    function createGradient(ctx, area) {
+      const gradient = ctx.createLinearGradient(0, area.bottom, 0, area.top);
+      gradient.addColorStop(0, color + '05');
+      gradient.addColorStop(1, color + '40');
+      return gradient;
+    }
+
+    function renderChart(period) {
+      const { labels, values } = loadPeriodData(period);
+
+      if (labels.length === 0) return;
+
+      const high = Math.max(...values);
+      const low = Math.min(...values);
+      const highLowEl = document.getElementById(chartId + '-highlow');
+      if (highLowEl) {
+        highLowEl.innerHTML =
+          '<span class="high">En yüksek: ' + high.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₺</span>' +
+          '<span class="low">En düşük: ' + low.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₺</span>';
+      }
+
+      const canvas = document.getElementById(chartId);
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: getChartLabel(currency),
+            data: values,
+            borderColor: color,
+            backgroundColor: function(context) {
+              const chart = context.chart;
+              const { ctx: c, chartArea } = chart;
+              if (!chartArea) return color + '40';
+              return createGradient(c, chartArea);
+            },
+            fill: true,
+            tension: 0.3,
+            pointRadius: 0,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: color,
+            pointHoverBorderColor: '#fff',
+            pointHoverBorderWidth: 2,
+            borderWidth: 2,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            intersect: false,
+            mode: 'index',
+          },
+          plugins: {
+            legend: {
+              display: false,
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              titleFont: { size: 12 },
+              bodyFont: { size: 13, weight: 'bold' },
+              padding: 10,
+              cornerRadius: 6,
+              displayColors: false,
+              callbacks: {
+                title: function(items) {
+                  return items[0].label;
+                },
+                label: function(context) {
+                  return context.parsed.y.toLocaleString('tr-TR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }) + ' ₺';
+                },
+              },
+            },
+          },
+          scales: {
+            x: {
+              grid: {
+                display: false,
+              },
+              ticks: {
+                color: '#9ca3af',
+                font: { size: 11 },
+                maxTicksLimit: 8,
+                maxRotation: 0,
+              },
+              border: {
+                display: false,
+              },
+            },
+            y: {
+              position: 'right',
+              grid: {
+                color: '#f3f4f6',
+                drawBorder: false,
+              },
+              ticks: {
+                color: '#9ca3af',
+                font: { size: 11 },
+                callback: function(value) {
+                  return value.toLocaleString('tr-TR') + ' ₺';
+                },
+                maxTicksLimit: 6,
+              },
+              border: {
+                display: false,
+              },
+            },
+          },
+        },
+      });
+    }
+
+    renderChart(initialPeriod);
+
+    document.querySelectorAll('.period-tab[data-chart-id="' + chartId + '"]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.period-tab[data-chart-id="' + chartId + '"]').forEach(function(b) {
+          b.classList.remove('active');
+        });
+        this.classList.add('active');
+        renderChart(this.getAttribute('data-period'));
+      });
+    });
+  };
+</script>
+
+<script>
+  import { getChartColor, getChartLabel, aggregateDataForPeriod } from '../utils/chartHelpers';
+  import { getPeriodData } from '../utils/rateHelpers';
+
+  const currency = '{currency}';
+  const initialPeriod = '{defaultPeriod}';
+  const chartId = '{chartId}';
+
+  window.__rateData = window.__rateData || {};
+
+  async function loadHistoricalData() {
+    let dataPath;
+    if (currency === 'USD') {
+      dataPath = (await import('../data/rates_historical_usd.json')).default;
+    } else if (currency === 'EUR') {
+      dataPath = (await import('../data/rates_historical_eur.json')).default;
+    } else if (currency === 'GOLD') {
+      dataPath = (await import('../data/rates_historical_gold.json')).default;
+    }
+
+    if (dataPath) {
+      window.__rateData[currency] = dataPath;
+    }
+  }
+
+  async function init() {
+    await loadHistoricalData();
+
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+    script.onload = function() {
+      if (typeof window.initRateChart === 'function') {
+        window.initRateChart(chartId, currency, initialPeriod, {height});
+      }
+    };
+    document.head.appendChild(script);
+  }
+
+  init();
+</script>
+
+<style>
+  .rate-chart-wrapper {
+    width: 100%;
+    position: relative;
+  }
+
+  .period-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+
+  .period-tab {
+    padding: 6px 12px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+
+  .period-tab:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+  }
+
+  .period-tab.active {
+    background: #111827;
+    color: #fff;
+    border-color: #111827;
+  }
+
+  .chart-container {
+    position: relative;
+    width: 100%;
+    height: calc(100% - 60px);
+  }
+
+  .high-low {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .high-low .high {
+    color: #10b981;
+    font-weight: 500;
+  }
+
+  .high-low .low {
+    color: #ef4444;
+    font-weight: 500;
+  }
+</style>

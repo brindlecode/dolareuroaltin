@@ -1,0 +1,439 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import RateTicker from '../components/RateTicker.astro';
+import RateCard from '../components/RateCard.astro';
+import GoldCard from '../components/GoldCard.astro';
+import RateChart from '../components/RateChart.astro';
+import ConversionWidget from '../components/ConversionWidget.astro';
+import EconomicCalendar from '../components/EconomicCalendar.astro';
+import AffiliateBanner from '../components/AffiliateBanner.astro';
+import AdSenseSlot from '../components/AdSenseSlot.astro';
+import LastUpdated from '../components/LastUpdated.astro';
+import HistoryCalculator from '../components/HistoryCalculator.astro';
+import rates from '../data/rates_current.json';
+import { formatTRY, formatRate, formatCompact, getChangeClass, getChangeIcon, generateSparkline, formatDateFull } from '../utils/rateHelpers';
+
+const usd = rates.rates.USD;
+const eur = rates.rates.EUR;
+const gbp = rates.rates.GBP;
+const chf = rates.rates.CHF;
+const sar = rates.rates.SAR;
+
+const gram = rates.gold.gram;
+const ceyrek = rates.gold.ceyrek;
+const yarim = rates.gold.yarim;
+const tam = rates.gold.tam;
+const ata = rates.gold.ata;
+const bilezik14 = rates.gold.bilezik_14;
+const bilezik18 = rates.gold.bilezik_18;
+const ons = rates.gold.xau_usd;
+
+const btc = rates.crypto.BTC;
+const eth = rates.crypto.ETH;
+
+function makeSparkline(base: number, change: number, points = 12): number[] {
+  const result: number[] = [];
+  const step = change / points;
+  for (let i = 0; i < points; i++) {
+    result.push(base + step * i + (Math.random() - 0.5) * Math.abs(change) * 0.3);
+  }
+  result.push(base + change);
+  return result;
+}
+
+const usdSparkline = generateSparkline(makeSparkline(usd.open, usd.change_daily));
+const eurSparkline = generateSparkline(makeSparkline(eur.open, eur.change_daily));
+const gbpSparkline = generateSparkline(makeSparkline(gbp.open, gbp.change_daily));
+
+const formattedDate = formatDateFull(rates.last_updated);
+---
+
+<BaseLayout
+  title="Dolar Euro Altın — Güncel Kurlar ve Fiyatlar"
+  description="Dolar, Euro, Altın ve diğer döviz kurlarının güncel fiyatları. TCMB resmi verisi ile anlık kur takibi, döviz çevirici ve altın fiyatları."
+  canonical="https://dolareuroaltin.com/"
+>
+  <Header slot="header" />
+
+  <RateTicker />
+
+  <section class="mb-8 mt-6" aria-label="Giriş">
+    <div class="text-center">
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
+        Dolar Euro Altın Kurları — Güncel Fiyatlar
+      </h1>
+      <p class="text-sm text-gray-500 mb-1">{formattedDate}</p>
+      <p class="text-xs text-gray-400">TCMB resmi verisi • Her saat güncellenir</p>
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Ana kurlar">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <RateCard
+        code={usd.code}
+        name_tr={usd.name_tr}
+        symbol={usd.symbol}
+        flag={usd.flag}
+        buying={usd.buying}
+        selling={usd.selling}
+        mid={usd.mid}
+        change_daily={usd.change_daily}
+        change_pct={usd.change_pct}
+        direction={usd.direction}
+        open={usd.open}
+        high={usd.high}
+        low={usd.low}
+        prev_close={usd.prev_close}
+        week_high={usd.week_high}
+        week_low={usd.week_low}
+        month_high={usd.month_high}
+        month_low={usd.month_low}
+        year_high={usd.year_high}
+        year_low={usd.year_low}
+        size="medium"
+        sparklineSvg={usdSparkline}
+      />
+      <RateCard
+        code={eur.code}
+        name_tr={eur.name_tr}
+        symbol={eur.symbol}
+        flag={eur.flag}
+        buying={eur.buying}
+        selling={eur.selling}
+        mid={eur.mid}
+        change_daily={eur.change_daily}
+        change_pct={eur.change_pct}
+        direction={eur.direction}
+        open={eur.open}
+        high={eur.high}
+        low={eur.low}
+        prev_close={eur.prev_close}
+        week_high={eur.week_high}
+        week_low={eur.week_low}
+        month_high={eur.month_high}
+        month_low={eur.month_low}
+        year_high={eur.year_high}
+        year_low={eur.year_low}
+        size="medium"
+        sparklineSvg={eurSparkline}
+      />
+      <RateCard
+        code={gbp.code}
+        name_tr={gbp.name_tr}
+        symbol={gbp.symbol}
+        flag={gbp.flag}
+        buying={gbp.buying}
+        selling={gbp.selling}
+        mid={gbp.mid}
+        change_daily={gbp.change_daily}
+        change_pct={gbp.change_pct}
+        direction={gbp.direction}
+        open={gbp.open}
+        high={gbp.high}
+        low={gbp.low}
+        prev_close={gbp.prev_close}
+        week_high={gbp.week_high}
+        week_low={gbp.week_low}
+        month_high={gbp.month_high}
+        month_low={gbp.month_low}
+        year_high={gbp.year_high}
+        year_low={gbp.year_low}
+        size="medium"
+        sparklineSvg={gbpSparkline}
+      />
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Altın fiyatları">
+    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+      <span class="text-xl">🥇</span>
+      Altın Fiyatları
+    </h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+      <GoldCard
+        key="gram"
+        name_tr={gram.name_tr}
+        buying={gram.buying}
+        selling={gram.selling}
+        mid={gram.mid}
+        change_daily={gram.change_daily}
+        change_pct={gram.change_pct}
+        direction={gram.direction}
+        size="large"
+      />
+      <GoldCard
+        key="ceyrek"
+        name_tr={ceyrek.name_tr}
+        buying={ceyrek.buying}
+        selling={ceyrek.selling}
+        mid={ceyrek.mid}
+        change_daily={ceyrek.change_daily}
+        change_pct={ceyrek.change_pct}
+        direction={ceyrek.direction}
+        size="large"
+      />
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+      <GoldCard
+        key="yarim"
+        name_tr={yarim.name_tr}
+        buying={yarim.buying}
+        selling={yarim.selling}
+        mid={yarim.mid}
+        change_daily={yarim.change_daily}
+        change_pct={yarim.change_pct}
+        direction={yarim.direction}
+        size="medium"
+      />
+      <GoldCard
+        key="tam"
+        name_tr={tam.name_tr}
+        buying={tam.buying}
+        selling={tam.selling}
+        mid={tam.mid}
+        change_daily={tam.change_daily}
+        change_pct={tam.change_pct}
+        direction={tam.direction}
+        size="medium"
+      />
+      <GoldCard
+        key="ata"
+        name_tr={ata.name_tr}
+        buying={ata.buying}
+        selling={ata.selling}
+        mid={ata.mid}
+        change_daily={ata.change_daily}
+        change_pct={ata.change_pct}
+        direction={ata.direction}
+        size="medium"
+      />
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <table class="w-full text-sm" role="table" aria-label="Diğer altın türleri">
+        <thead>
+          <tr class="border-b border-gray-100 bg-gray-50">
+            <th class="py-2.5 px-3 text-left font-semibold text-gray-500 text-xs uppercase tracking-wider">Altın</th>
+            <th class="py-2.5 px-3 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Alış</th>
+            <th class="py-2.5 px-3 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Satış</th>
+            <th class="py-2.5 px-3 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Değişim</th>
+          </tr>
+        </thead>
+        <tbody>
+          <GoldCard
+            key="bilezik_14"
+            name_tr={bilezik14.name_tr}
+            buying={bilezik14.buying}
+            selling={bilezik14.selling}
+            mid={bilezik14.mid}
+            change_daily={bilezik14.change_daily}
+            change_pct={bilezik14.change_pct}
+            direction={bilezik14.direction}
+            size="small"
+          />
+          <GoldCard
+            key="bilezik_18"
+            name_tr={bilezik18.name_tr}
+            buying={bilezik18.buying}
+            selling={bilezik18.selling}
+            mid={bilezik18.mid}
+            change_daily={bilezik18.change_daily}
+            change_pct={bilezik18.change_pct}
+            direction={bilezik18.direction}
+            size="small"
+          />
+          <GoldCard
+            key="xau_usd"
+            name_tr={ons.name_tr}
+            buying={ons.buying}
+            selling={ons.selling}
+            mid={ons.mid}
+            change_daily={ons.change_daily}
+            change_pct={ons.change_pct}
+            direction={ons.direction}
+            unit={ons.unit}
+            size="small"
+          />
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <AdSenseSlot size="leaderboard" />
+
+  <section class="mb-8" aria-label="Dolar grafiği">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+      <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <span class="text-lg">{usd.flag}</span>
+        USD/TRY Grafiği
+      </h2>
+      <RateChart currency="USD" defaultPeriod="1y" height={320} />
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Euro ve Altın grafikleri">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <span class="text-lg">{eur.flag}</span>
+          EUR/TRY Grafiği
+        </h2>
+        <RateChart currency="EUR" defaultPeriod="1y" height={280} />
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <span class="text-lg">🪙</span>
+          Gram Altın Grafiği
+        </h2>
+        <RateChart currency="GOLD" defaultPeriod="1y" height={280} />
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Döviz çevirici">
+    <ConversionWidget />
+  </section>
+
+  <section class="mb-8" aria-label="Diğer kurlar">
+    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+      <span class="text-lg">💱</span>
+      Diğer Kurlar
+    </h2>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <table class="w-full text-sm" role="table" aria-label="Diğer döviz kurları">
+        <thead>
+          <tr class="border-b border-gray-100 bg-gray-50">
+            <th class="py-2.5 px-3 text-left font-semibold text-gray-500 text-xs uppercase tracking-wider">Kur</th>
+            <th class="py-2.5 px-3 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Alış</th>
+            <th class="py-2.5 px-3 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Satış</th>
+            <th class="py-2.5 px-3 text-right font-semibold text-gray-500 text-xs uppercase tracking-wider">Değişim</th>
+          </tr>
+        </thead>
+        <tbody>
+          <RateCard
+            code={chf.code}
+            name_tr={chf.name_tr}
+            symbol={chf.symbol}
+            flag={chf.flag}
+            buying={chf.buying}
+            selling={chf.selling}
+            mid={chf.mid}
+            change_daily={chf.change_daily}
+            change_pct={chf.change_pct}
+            direction={chf.direction}
+            open={chf.open}
+            high={chf.high}
+            low={chf.low}
+            prev_close={chf.prev_close}
+            size="small"
+          />
+          <RateCard
+            code={sar.code}
+            name_tr={sar.name_tr}
+            symbol={sar.symbol}
+            flag={sar.flag}
+            buying={sar.buying}
+            selling={sar.selling}
+            mid={sar.mid}
+            change_daily={sar.change_daily}
+            change_pct={sar.change_pct}
+            direction={sar.direction}
+            open={sar.open}
+            high={sar.high}
+            low={sar.low}
+            prev_close={sar.prev_close}
+            size="small"
+          />
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="mb-8" aria-label="Kripto para">
+    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+      <span class="text-lg">₿</span>
+      Kripto Para Fiyatları
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">₿</span>
+            <div>
+              <div class="font-bold text-gray-900">Bitcoin</div>
+              <div class="text-xs text-gray-500">BTC</div>
+            </div>
+          </div>
+          <span class={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold ${btc.direction === 'up' ? 'text-emerald-600 bg-emerald-50' : 'text-red-600 bg-red-50'}`}>
+            {btc.direction === 'up' ? '▲' : '▼'} %{Math.abs(btc.change_pct).toFixed(2)}
+          </span>
+        </div>
+        <div class="text-2xl font-bold font-mono text-gray-900">
+          ₺{formatCompact(btc.price_try)}
+        </div>
+        <div class="text-xs text-gray-400 mt-1">${formatRate(btc.price_usd)}</div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">Ξ</span>
+            <div>
+              <div class="font-bold text-gray-900">Ethereum</div>
+              <div class="text-xs text-gray-500">ETH</div>
+            </div>
+          </div>
+          <span class={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold ${eth.direction === 'up' ? 'text-emerald-600 bg-emerald-50' : 'text-red-600 bg-red-50'}`}>
+            {eth.direction === 'up' ? '▲' : '▼'} %{Math.abs(eth.change_pct).toFixed(2)}
+          </span>
+        </div>
+        <div class="text-2xl font-bold font-mono text-gray-900">
+          ₺{formatTRY(eth.price_try)}
+        </div>
+        <div class="text-xs text-gray-400 mt-1">${formatRate(eth.price_usd)}</div>
+      </div>
+    </div>
+    <AffiliateBanner type="crypto" />
+  </section>
+
+  <section class="mb-8" aria-label="Geçmişte alsaydım">
+    <HistoryCalculator />
+  </section>
+
+  <section class="mb-8" aria-label="Ekonomik takvim">
+    <EconomicCalendar />
+  </section>
+
+  <AdSenseSlot size="rectangle" />
+
+  <section class="mb-8 mt-8" aria-label="Dolar kuru hakkında">
+    <article class="prose prose-gray max-w-none">
+      <h2 class="text-xl font-bold text-gray-900 mb-3">Dolar Kuru Hakkında</h2>
+      <p class="text-gray-600 leading-relaxed mb-4">
+        Dolar kuru, Amerikan Doları'nın Türk Lirası karşısındaki değerini ifade eder. Türkiye'de en çok takip edilen döviz kuru olan USD/TRY,
+        TCMB (Türkiye Cumhuriyet Merkez Bankası) tarafından her iş günü saat 15:30'da açıklanan resmi kurlar ile belirlenir.
+        Dolar kuru; faiz kararları, enflasyon verileri, dış ticaret dengesi ve küresel piyasalardaki gelişmelerden etkilenir.
+        Yatırımcılar ve vatandaşlar için günlük hayatı doğrudan etkileyen bu kur, ithalat-ihracat fiyatlarından konut ve araç
+        fiyatlarına kadar birçok alanda belirleyici rol oynar.
+      </p>
+    </article>
+  </section>
+
+  <section class="mb-8" aria-label="Altın fiyatları hakkında">
+    <article class="prose prose-gray max-w-none">
+      <h2 class="text-xl font-bold text-gray-900 mb-3">Altın Fiyatları Nasıl Belirlenir?</h2>
+      <p class="text-gray-600 leading-relaxed mb-4">
+        Altın fiyatları, uluslararası piyasalarda ons (XAU/USD) bazında belirlenir ve bu fiyat, dolar kuru ile çarpılarak
+        gram altın fiyatı hesaplanır. Türkiye'de altın fiyatları; Kapalıçarşı ve İstanbul Altın Rafinerisi gibi piyasalarda
+        alım-satım işlemleri ile şekillenir. Gram altın, çeyrek altın, yarım altın, tam altın (Cumhuriyet altını) ve Ata altın
+        gibi farklı türlerde işlem gören altın, güvenli liman yatırımcıların gözdesidir. Altın fiyatları; ABD dolar endeksi (DXY),
+        küresel faiz oranları, jeopolitik riskler ve enflasyon beklentilerinden doğrudan etkilenir.
+      </p>
+    </article>
+  </section>
+
+  <Footer slot="footer" />
+</BaseLayout>
